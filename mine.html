@@ -1,0 +1,1193 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Моё расписание</title>
+  <style>
+    :root{
+      --bg:#f3f6fb;
+      --card:#ffffff;
+      --text:#13213a;
+      --muted:#5b6b84;
+      --line:#dbe3f0;
+      --brand:#0f6aa8;
+      --brand2:#0b5c93;
+      --pill:#e9f2fb;
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --shadow: 0 10px 30px rgba(13,42,82,.12);
+      --radius:16px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color:var(--text);
+      background: var(--bg);
+    }
+    .wrap{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+      display:grid;
+      grid-template-columns: 1.65fr 1fr;
+      gap: 18px;
+      align-items:start;
+    }
+    header{
+      max-width:1180px;
+      margin: 0 auto;
+      padding: 18px 18px 0;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    h1{
+      margin:0;
+      font-size: 28px;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size: 13px;
+      margin-top:6px;
+    }
+
+    .chipbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .chip{
+      border:1px solid var(--line);
+      background: var(--card);
+      padding: 10px 12px;
+      border-radius: 999px;
+      box-shadow: 0 4px 14px rgba(13,42,82,.06);
+      font-size: 13px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+    }
+    .chip b{ font-weight:700; }
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background: var(--card);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 4px 14px rgba(13,42,82,.06);
+      transition: transform .06s ease, border-color .15s ease, background .15s ease;
+      user-select:none;
+    }
+    .btn:hover{ border-color: rgba(15,106,168,.35); background: #f8fbff; }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: linear-gradient(180deg, var(--brand), var(--brand2));
+      color:#fff;
+      border-color: rgba(0,0,0,0);
+      box-shadow: 0 10px 22px rgba(15,106,168,.22);
+    }
+    .btn.primary:hover{ filter: brightness(1.03); }
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-h{
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+    }
+    .badge{
+      background: linear-gradient(180deg, var(--brand), var(--brand2));
+      color:#fff;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight:800;
+      box-shadow: 0 10px 22px rgba(15,106,168,.22);
+      white-space:nowrap;
+    }
+
+    /* Tabs */
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .tab{
+      padding: 10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: #f7fbff;
+      cursor:pointer;
+      font-size: 13px;
+      user-select:none;
+    }
+    .tab.active{
+      background: var(--pill);
+      border-color: rgba(15,106,168,.28);
+      color: var(--brand2);
+      font-weight: 800;
+    }
+
+    /* Left column: timeline */
+    .daybar{
+      padding: 10px 14px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+    }
+    select, input[type="text"]{
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline:none;
+      background:#fff;
+    }
+    input[type="text"]{ min-width: 240px; }
+
+    .timeline{
+      padding: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+      max-height: calc(100vh - 220px);
+      overflow:auto;
+    }
+    .slot{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+    .time{
+      font-family: var(--mono);
+      font-weight: 800;
+      color: var(--text);
+      font-size: 14px;
+      padding-top: 6px;
+      white-space:nowrap;
+    }
+    .event{
+      border: 2px solid rgba(15,106,168,.35);
+      border-radius: 12px;
+      background: #f6fbff;
+      overflow:hidden;
+    }
+    .event .top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 12px 10px;
+      border-bottom: 1px solid rgba(15,106,168,.18);
+    }
+    .event .name{
+      font-weight: 900;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .event .tag{
+      background: #dff0ff;
+      border: 1px solid rgba(15,106,168,.20);
+      padding: 8px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--brand2);
+      white-space:nowrap;
+    }
+    .event .body{
+      padding: 10px 12px 12px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .meta{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .kv{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      white-space:nowrap;
+    }
+    .kv b{ color: var(--text); }
+    .actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .iconbtn{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      user-select:none;
+    }
+    .iconbtn:hover{ border-color: rgba(15,106,168,.35); background:#f8fbff; }
+
+    /* Right column: calendar */
+    .right{
+      position: sticky;
+      top: 12px;
+    }
+    .cal{
+      padding: 14px;
+    }
+    .calhead{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom: 10px;
+    }
+    .calhead .month{
+      font-weight: 900;
+      color: var(--brand2);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+    .dow{
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted);
+      text-align:center;
+      padding: 6px 0;
+      background: #edf4ff;
+      border-radius: 8px;
+      border:1px solid var(--line);
+    }
+    .cell{
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: #f7fbff;
+      display:flex;
+      align-items:flex-end;
+      justify-content:flex-end;
+      padding: 6px;
+      font-family: var(--mono);
+      font-size: 12px;
+      cursor:pointer;
+      position:relative;
+      user-select:none;
+    }
+    .cell.muted{ opacity:.45; }
+    .cell.today{
+      outline: 3px solid rgba(15,106,168,.22);
+      border-color: rgba(15,106,168,.35);
+    }
+    .cell.selected{
+      background: #dff0ff;
+      border-color: rgba(15,106,168,.40);
+    }
+    .dot{
+      position:absolute;
+      left: 6px;
+      top: 6px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background: var(--brand);
+      display:none;
+    }
+    .cell.has .dot{ display:block; }
+
+    .sideactions{
+      padding: 0 14px 14px;
+      display:grid;
+      gap:10px;
+    }
+    .sideactions .btn{ width:100%; justify-content:center; }
+    .note{
+      padding: 0 14px 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* Modal */
+    .modal-back{
+      position:fixed;
+      inset:0;
+      background: rgba(10,23,40,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 20;
+    }
+    .modal{
+      width: min(760px, 100%);
+      background: #fff;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .modal-h{
+      padding: 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfdff;
+      font-weight: 900;
+    }
+    .modal-b{
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field label{
+      display:block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+    .field input, .field textarea, .field select{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline:none;
+      background:#fff;
+    }
+    textarea{ min-height: 92px; resize: vertical; }
+    .modal-f{
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      background: #fbfdff;
+    }
+    .modal-f .btn{ box-shadow:none; }
+    .file{ display:none; }
+
+    @media (max-width: 980px){
+      .wrap{ grid-template-columns: 1fr; }
+      .right{ position: static; }
+      .timeline{ max-height: unset; }
+      .modal-b{ grid-template-columns: 1fr; }
+      input[type="text"]{ min-width: 180px; width: 100%; }
+      .daybar{ align-items:stretch; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Расписание занятий</h1>
+      <div class="subtitle">Пары в вузе · Уроки/внеурочка · Личные задачи (всё редактируется и сохраняется локально)</div>
+    </div>
+    <div class="chipbar">
+      <span class="chip">Выбранная дата: <b id="chipDate">—</b></span>
+      <button class="btn primary" id="btnAdd">➕ Добавить</button>
+      <button class="btn" id="btnExport">⬇️ Экспорт</button>
+      <button class="btn" id="btnImport">⬆️ Импорт</button>
+      <input class="file" id="fileImport" type="file" accept="application/json" />
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- LEFT -->
+    <div class="card">
+      <div class="card-h">
+        <div class="title">
+          <span class="badge" id="badgeGroup">Неделя</span>
+          <span id="leftTitle">Мои события</span>
+        </div>
+        <div class="tabs" id="tabs">
+          <div class="tab active" data-mode="uni">Вуз</div>
+          <div class="tab" data-mode="teach">Мои занятия</div>
+          <div class="tab" data-mode="tasks">Задачи</div>
+          <div class="tab" data-mode="all">Все</div>
+        </div>
+      </div>
+
+      <div class="daybar">
+        <select id="daySelect" title="День недели"></select>
+        <select id="typeFilter" title="Фильтр по типу"></select>
+        <input id="search" type="text" placeholder="Поиск: предмет / место / преподаватель / комментарий" />
+        <button class="btn" id="btnToday">Сегодня</button>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right">
+      <div class="card">
+        <div class="card-h">
+          <div class="title">Календарь</div>
+          <div class="badge" id="badgeMonth">—</div>
+        </div>
+
+        <div class="cal">
+          <div class="calhead">
+            <button class="btn" id="mPrev">◀</button>
+            <div class="month" id="monthTitle">—</div>
+            <button class="btn" id="mNext">▶</button>
+          </div>
+
+          <div class="grid" id="dowRow"></div>
+          <div class="grid" id="calGrid" style="margin-top:8px;"></div>
+        </div>
+
+        <div class="sideactions">
+          <button class="btn primary" id="btnAddFromDate">➕ Добавить на выбранный день</button>
+          <button class="btn" id="btnClear">🧹 Очистить (осторожно)</button>
+        </div>
+
+        <div class="note">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal-back" id="modalBack" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true">
+      <div class="modal-h">
+        <div id="modalTitle">Добавить событие</div>
+        <button class="btn" id="btnClose">✖</button>
+      </div>
+
+      <div class="modal-b">
+        <div class="field">
+          <label>Режим</label>
+          <select id="fMode">
+            <option value="uni">Вуз</option>
+            <option value="teach">Мои занятия</option>
+            <option value="tasks">Задачи</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Тип (ярлык справа)</label>
+          <input id="fType" placeholder="например: Лекционная / Практика / Внеурочка / Дело" />
+        </div>
+
+        <div class="field">
+          <label>День недели</label>
+          <select id="fDow"></select>
+        </div>
+
+        <div class="field">
+          <label>Дата (опционально, если разово)</label>
+          <input id="fDate" type="date" />
+        </div>
+
+        <div class="field">
+          <label>Время начала</label>
+          <input id="fStart" type="time" />
+        </div>
+
+        <div class="field">
+          <label>Время конца</label>
+          <input id="fEnd" type="time" />
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Название</label>
+          <input id="fTitle" placeholder="например: Архитектура ЭВМ / Олимпиадная математика / Военная кафедра" />
+        </div>
+
+        <div class="field">
+          <label>Место / аудитория</label>
+          <input id="fPlace" placeholder="например: ауд. 218 / онлайн / корпус" />
+        </div>
+
+        <div class="field">
+          <label>Преподаватель / для кого</label>
+          <input id="fPerson" placeholder="например: ФИО / группа / класс" />
+        </div>
+
+        <div class="field" style="grid-column: 1 / -1;">
+          <label>Комментарий</label>
+          <textarea id="fNote" placeholder="любые детали"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-f">
+        <button class="btn" id="btnDelete" style="display:none;">🗑 Удалить</button>
+        <button class="btn" id="btnCancel">Отмена</button>
+        <button class="btn primary" id="btnSave">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== Data model =====
+    // Event:
+    // {
+    //   id, mode: 'uni'|'teach'|'tasks',
+    //   type, title, place, person, note,
+    //   dow: 1..7 (Mon..Sun),
+    //   date: 'YYYY-MM-DD' | '' (если разово),
+    //   start:'HH:MM', end:'HH:MM'
+    // }
+
+    const STORAGE_KEY = "my_schedule_v1";
+
+    const DOW = [
+      {n:1, k:"ПН", name:"Понедельник"},
+      {n:2, k:"ВТ", name:"Вторник"},
+      {n:3, k:"СР", name:"Среда"},
+      {n:4, k:"ЧТ", name:"Четверг"},
+      {n:5, k:"ПТ", name:"Пятница"},
+      {n:6, k:"СБ", name:"Суббота"},
+      {n:7, k:"ВС", name:"Воскресенье"},
+    ];
+
+    const MODE_LABEL = {
+      uni: "Вуз",
+      teach: "Мои занятия",
+      tasks: "Задачи",
+      all: "Все"
+    };
+
+    const el = (id)=>document.getElementById(id);
+
+    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+
+    function pad2(n){ return String(n).padStart(2,"0"); }
+
+    function todayISO(){
+      const d = new Date();
+      return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+    }
+
+    function dowFromDateISO(iso){
+      // JS getDay(): 0 Sun..6 Sat => map to 1..7 Mon..Sun
+      const d = new Date(iso + "T00:00:00");
+      const g = d.getDay();
+      return g === 0 ? 7 : g;
+    }
+
+    function hhmmToMin(t){
+      if (!t) return 0;
+      const [h,m]=t.split(":").map(Number);
+      return (h||0)*60+(m||0);
+    }
+
+    function minToHHMM(m){
+      const h = Math.floor(m/60), mm = m%60;
+      return `${pad2(h)}:${pad2(mm)}`;
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    // ===== App state =====
+    let events = [];
+    let mode = "uni";         // uni | teach | tasks | all
+    let selectedDate = todayISO();
+    let selectedDow = dowFromDateISO(selectedDate);
+
+    // calendar month cursor
+    let calYear, calMonth; // month 0..11
+
+    // modal state
+    let editingId = null;
+
+    // ===== Defaults (ваши уже добавлены) =====
+    function seedDefaultsIfEmpty(){
+      if (events.length) return;
+
+      events = [
+        {
+          id: uid(),
+          mode: "uni",
+          type: "Военная кафедра",
+          title: "Военная кафедра",
+          place: "",
+          person: "",
+          note: "",
+          dow: 5, // ПТ
+          date: "", // каждую пятницу
+          start: "08:30",
+          end: "17:10"
+        },
+        {
+          id: uid(),
+          mode: "teach",
+          type: "Внеурочка",
+          title: "Олимпиадная математика",
+          place: "",
+          person: "",
+          note: "",
+          dow: 3, // СР
+          date: "",
+          start: "20:00",
+          end: "21:30"
+        }
+      ];
+
+      save();
+    }
+
+    // ===== Storage =====
+    function load(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        events = raw ? JSON.parse(raw) : [];
+      }catch(e){
+        events = [];
+      }
+    }
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    }
+
+    // ===== UI init =====
+    function initSelects(){
+      // daySelect
+      const daySelect = el("daySelect");
+      daySelect.innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
+      daySelect.value = String(selectedDow);
+
+      // modal fDow
+      const fDow = el("fDow");
+      fDow.innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
+
+      // typeFilter
+      rebuildTypeFilter();
+    }
+
+    function rebuildTypeFilter(){
+      const typeFilter = el("typeFilter");
+      const types = Array.from(new Set(events.map(e=>e.type).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ru"));
+      typeFilter.innerHTML = [`<option value="">Все типы</option>`]
+        .concat(types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`))
+        .join("");
+    }
+
+    function setTabs(){
+      document.querySelectorAll(".tab").forEach(t=>{
+        t.classList.toggle("active", t.dataset.mode===mode);
+      });
+      el("leftTitle").textContent = MODE_LABEL[mode] === "Все" ? "Все события" : `Раздел: ${MODE_LABEL[mode]}`;
+    }
+
+    // ===== Render timeline =====
+    function visibleEventsForDay(dow, dateISO){
+      const q = el("search").value.trim().toLowerCase();
+      const typeF = el("typeFilter").value;
+      return events
+        .filter(e=>{
+          // mode filter
+          if (mode !== "all" && e.mode !== mode) return false;
+
+          // date/dow match:
+          // if e.date set -> only that date
+          // else -> weekly by dow
+          if (e.date){
+            if (e.date !== dateISO) return false;
+          } else {
+            if (Number(e.dow) !== Number(dow)) return false;
+          }
+
+          // type filter
+          if (typeF && e.type !== typeF) return false;
+
+          // search
+          if (!q) return true;
+          const hay = `${e.title} ${e.type} ${e.place} ${e.person} ${e.note}`.toLowerCase();
+          return hay.includes(q);
+        })
+        .sort((a,b)=>{
+          const sa = hhmmToMin(a.start);
+          const sb = hhmmToMin(b.start);
+          if (sa !== sb) return sa - sb;
+          return (a.title||"").localeCompare(b.title||"","ru");
+        });
+    }
+
+    function renderTimeline(){
+      const tl = el("timeline");
+      const list = visibleEventsForDay(selectedDow, selectedDate);
+
+      // header chips
+      el("chipDate").textContent = `${selectedDate} · ${DOW.find(d=>d.n===selectedDow).name}`;
+
+      // badge "Неделя / Дата"
+      const weeklyCount = list.filter(e=>!e.date).length;
+      const onceCount = list.filter(e=>!!e.date).length;
+      el("badgeGroup").textContent = onceCount ? "Разовые + недельные" : "Неделя";
+
+      if (!list.length){
+        tl.innerHTML = `
+          <div style="padding:12px;color:var(--muted);">
+            Ничего не запланировано на этот день. Нажмите <b>“Добавить”</b>.
+          </div>`;
+        return;
+      }
+
+      tl.innerHTML = "";
+      const frag = document.createDocumentFragment();
+
+      for (const e of list){
+        const slot = document.createElement("div");
+        slot.className = "slot";
+
+        const time = document.createElement("div");
+        time.className = "time";
+        time.textContent = `${e.start} — ${e.end}`;
+
+        const card = document.createElement("div");
+        card.className = "event";
+
+        const top = document.createElement("div");
+        top.className = "top";
+        top.innerHTML = `
+          <div class="name">${escapeHtml(e.title || "Без названия")}</div>
+          <div class="tag">${escapeHtml(e.type || "Событие")}</div>
+        `;
+
+        const body = document.createElement("div");
+        body.className = "body";
+
+        const meta = [];
+        if (e.place) meta.push(`<span class="kv">📍 <b>${escapeHtml(e.place)}</b></span>`);
+        if (e.person) meta.push(`<span class="kv">👤 <b>${escapeHtml(e.person)}</b></span>`);
+        meta.push(`<span class="kv">🧩 <b>${escapeHtml(MODE_LABEL[e.mode] || e.mode)}</b></span>`);
+        if (e.date) meta.push(`<span class="kv">📅 <b>${escapeHtml(e.date)}</b></span>`);
+
+        body.innerHTML = `
+          <div class="row">
+            <div class="meta">${meta.join("")}</div>
+            <div class="actions">
+              <button class="iconbtn" data-act="edit" data-id="${e.id}">✏️ Редактировать</button>
+            </div>
+          </div>
+          ${e.note ? `<div>📝 ${escapeHtml(e.note)}</div>` : ``}
+        `;
+
+        card.appendChild(top);
+        card.appendChild(body);
+
+        slot.appendChild(time);
+        slot.appendChild(card);
+        frag.appendChild(slot);
+      }
+
+      tl.appendChild(frag);
+    }
+
+    // ===== Calendar =====
+    const MONTHS_RU = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
+
+    function setCalendarCursorFromSelected(){
+      const d = new Date(selectedDate + "T00:00:00");
+      calYear = d.getFullYear();
+      calMonth = d.getMonth();
+    }
+
+    function renderCalendar(){
+      el("badgeMonth").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
+      el("monthTitle").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
+
+      // DOW row
+      el("dowRow").innerHTML = DOW.map(d=>`<div class="dow">${d.k}</div>`).join("");
+
+      const grid = el("calGrid");
+      grid.innerHTML = "";
+
+      const first = new Date(calYear, calMonth, 1);
+      const startDay = (first.getDay() === 0) ? 7 : first.getDay(); // 1..7
+      const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+      // show 6 weeks (42 cells)
+      const cells = 42;
+      const startOffset = startDay - 1; // number of cells before day 1
+      const today = todayISO();
+
+      for (let i=0;i<cells;i++){
+        const dayNum = i - startOffset + 1;
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        let iso = "";
+        let muted = false;
+
+        if (dayNum < 1){
+          // previous month
+          const prevDays = new Date(calYear, calMonth, 0).getDate();
+          const d = prevDays + dayNum;
+          const dt = new Date(calYear, calMonth-1, d);
+          iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+          muted = true;
+          cell.classList.add("muted");
+          cell.textContent = d;
+        } else if (dayNum > daysInMonth){
+          // next month
+          const d = dayNum - daysInMonth;
+          const dt = new Date(calYear, calMonth+1, d);
+          iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+          muted = true;
+          cell.classList.add("muted");
+          cell.textContent = d;
+        } else {
+          // current month
+          const dt = new Date(calYear, calMonth, dayNum);
+          iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+          cell.textContent = dayNum;
+        }
+
+        cell.dataset.iso = iso;
+        cell.innerHTML = `<span class="dot"></span>${cell.innerHTML}`;
+
+        if (iso === today) cell.classList.add("today");
+        if (iso === selectedDate) cell.classList.add("selected");
+
+        // dot if there are events on that date OR weekly events for its dow
+        const dow = dowFromDateISO(iso);
+        const has = events.some(e=>{
+          if (e.date) return e.date === iso;
+          return Number(e.dow) === Number(dow);
+        });
+        if (has) cell.classList.add("has");
+
+        cell.addEventListener("click", ()=>{
+          selectedDate = iso;
+          selectedDow = dowFromDateISO(selectedDate);
+          el("daySelect").value = String(selectedDow);
+          renderCalendar();
+          renderTimeline();
+        });
+
+        grid.appendChild(cell);
+      }
+    }
+
+    // ===== Modal =====
+    function openModal(editId=null){
+      editingId = editId;
+      const isEdit = !!editId;
+
+      el("modalTitle").textContent = isEdit ? "Редактировать событие" : "Добавить событие";
+      el("btnDelete").style.display = isEdit ? "inline-flex" : "none";
+
+      // fill fields
+      if (isEdit){
+        const e = events.find(x=>x.id===editId);
+        if (!e) return;
+        el("fMode").value = e.mode;
+        el("fType").value = e.type || "";
+        el("fDow").value = String(e.dow || selectedDow);
+        el("fDate").value = e.date || "";
+        el("fStart").value = e.start || "09:00";
+        el("fEnd").value = e.end || "10:00";
+        el("fTitle").value = e.title || "";
+        el("fPlace").value = e.place || "";
+        el("fPerson").value = e.person || "";
+        el("fNote").value = e.note || "";
+      } else {
+        el("fMode").value = (mode==="all") ? "uni" : mode;
+        el("fType").value = "";
+        el("fDow").value = String(selectedDow);
+        el("fDate").value = ""; // по умолчанию недельное
+        el("fStart").value = "09:00";
+        el("fEnd").value = "10:00";
+        el("fTitle").value = "";
+        el("fPlace").value = "";
+        el("fPerson").value = "";
+        el("fNote").value = "";
+      }
+
+      el("modalBack").style.display = "flex";
+      el("modalBack").setAttribute("aria-hidden","false");
+    }
+
+    function closeModal(){
+      el("modalBack").style.display = "none";
+      el("modalBack").setAttribute("aria-hidden","true");
+      editingId = null;
+    }
+
+    function saveModal(){
+      const e = {
+        id: editingId || uid(),
+        mode: el("fMode").value,
+        type: el("fType").value.trim() || "Событие",
+        title: el("fTitle").value.trim() || "Без названия",
+        place: el("fPlace").value.trim(),
+        person: el("fPerson").value.trim(),
+        note: el("fNote").value.trim(),
+        dow: Number(el("fDow").value),
+        date: el("fDate").value || "",
+        start: el("fStart").value || "09:00",
+        end: el("fEnd").value || "10:00",
+      };
+
+      // normalize: if date is set, dow can be derived but we keep it for convenience
+      if (e.date){
+        e.dow = dowFromDateISO(e.date);
+      }
+
+      // validate time
+      if (hhmmToMin(e.end) <= hhmmToMin(e.start)){
+        alert("Время конца должно быть позже времени начала.");
+        return;
+      }
+
+      if (editingId){
+        const idx = events.findIndex(x=>x.id===editingId);
+        if (idx>=0) events[idx] = e;
+      } else {
+        events.push(e);
+      }
+
+      save();
+      rebuildTypeFilter();
+      renderCalendar();
+      renderTimeline();
+      closeModal();
+    }
+
+    function deleteModal(){
+      if (!editingId) return;
+      if (!confirm("Удалить событие?")) return;
+      events = events.filter(x=>x.id!==editingId);
+      save();
+      rebuildTypeFilter();
+      renderCalendar();
+      renderTimeline();
+      closeModal();
+    }
+
+    // ===== Export/Import =====
+    function exportJSON(){
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        events
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json;charset=utf-8"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "schedule-export.json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function importJSONFile(file){
+      const text = await file.text();
+      const obj = JSON.parse(text);
+      const incoming = Array.isArray(obj) ? obj : obj.events;
+      if (!Array.isArray(incoming)) throw new Error("Неверный формат JSON.");
+      // basic sanitization
+      events = incoming.map(x=>({
+        id: x.id || uid(),
+        mode: x.mode || "tasks",
+        type: x.type || "Событие",
+        title: x.title || "Без названия",
+        place: x.place || "",
+        person: x.person || "",
+        note: x.note || "",
+        dow: Number(x.dow || 1),
+        date: x.date || "",
+        start: x.start || "09:00",
+        end: x.end || "10:00",
+      }));
+      save();
+      rebuildTypeFilter();
+      renderCalendar();
+      renderTimeline();
+    }
+
+    // ===== Events wiring =====
+    function wire(){
+      // tabs
+      el("tabs").addEventListener("click", (ev)=>{
+        const t = ev.target.closest(".tab");
+        if (!t) return;
+        mode = t.dataset.mode;
+        setTabs();
+        renderTimeline();
+      });
+
+      // day select
+      el("daySelect").addEventListener("change", ()=>{
+        selectedDow = Number(el("daySelect").value);
+        // keep selectedDate in sync: choose nearest date in current calendar month with that dow
+        // simpler: do not change selectedDate automatically, only timeline filter uses dow+date
+        renderTimeline();
+      });
+
+      // search/type filter
+      el("search").addEventListener("input", debounce(renderTimeline, 120));
+      el("typeFilter").addEventListener("change", renderTimeline);
+
+      // today
+      el("btnToday").addEventListener("click", ()=>{
+        selectedDate = todayISO();
+        selectedDow = dowFromDateISO(selectedDate);
+        el("daySelect").value = String(selectedDow);
+        setCalendarCursorFromSelected();
+        renderCalendar();
+        renderTimeline();
+      });
+
+      // timeline edit click
+      el("timeline").addEventListener("click", (ev)=>{
+        const b = ev.target.closest("[data-act='edit']");
+        if (!b) return;
+        openModal(b.dataset.id);
+      });
+
+      // add buttons
+      el("btnAdd").addEventListener("click", ()=>openModal(null));
+      el("btnAddFromDate").addEventListener("click", ()=>{
+        openModal(null);
+        // suggest "разово" on selected date (удобно)
+        el("fDate").value = selectedDate;
+        el("fDow").value = String(dowFromDateISO(selectedDate));
+      });
+
+      // modal
+      el("btnClose").addEventListener("click", closeModal);
+      el("btnCancel").addEventListener("click", closeModal);
+      el("btnSave").addEventListener("click", saveModal);
+      el("btnDelete").addEventListener("click", deleteModal);
+      el("modalBack").addEventListener("click", (ev)=>{
+        if (ev.target === el("modalBack")) closeModal();
+      });
+      document.addEventListener("keydown", (ev)=>{
+        if (ev.key === "Escape") closeModal();
+      });
+
+      // calendar nav
+      el("mPrev").addEventListener("click", ()=>{
+        calMonth -= 1;
+        if (calMonth < 0){ calMonth = 11; calYear -= 1; }
+        renderCalendar();
+      });
+      el("mNext").addEventListener("click", ()=>{
+        calMonth += 1;
+        if (calMonth > 11){ calMonth = 0; calYear += 1; }
+        renderCalendar();
+      });
+
+      // export/import
+      el("btnExport").addEventListener("click", exportJSON);
+      el("btnImport").addEventListener("click", ()=>el("fileImport").click());
+      el("fileImport").addEventListener("change", async (ev)=>{
+        const f = ev.target.files?.[0];
+        if (!f) return;
+        try{
+          await importJSONFile(f);
+        }catch(err){
+          alert("Ошибка импорта: " + (err?.message || err));
+        }finally{
+          ev.target.value = "";
+        }
+      });
+
+      // clear
+      el("btnClear").addEventListener("click", ()=>{
+        if (!confirm("Точно очистить ВСЕ события? Это удалит данные из браузера.")) return;
+        events = [];
+        save();
+        seedDefaultsIfEmpty();
+        rebuildTypeFilter();
+        renderCalendar();
+        renderTimeline();
+      });
+    }
+
+    function debounce(fn, ms){
+      let t=null;
+      return (...args)=>{
+        clearTimeout(t);
+        t=setTimeout(()=>fn(...args), ms);
+      };
+    }
+
+    // ===== Bootstrap =====
+    function boot(){
+      load();
+      seedDefaultsIfEmpty();
+
+      selectedDate = todayISO();
+      selectedDow = dowFromDateISO(selectedDate);
+
+      initSelects();
+      setTabs();
+
+      setCalendarCursorFromSelected();
+      renderCalendar();
+      renderTimeline();
+      wire();
+    }
+
+    boot();
+  </script>
+</body>
+</html>
