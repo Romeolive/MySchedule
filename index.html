@@ -14,21 +14,21 @@
       --brand:#0f6aa8;
       --brand2:#0b5c93;
       --pill:#e9f2fb;
-      --good:#16a34a;
-      --warn:#f59e0b;
-      --bad:#ef4444;
       --shadow: 0 10px 30px rgba(13,42,82,.12);
       --radius:16px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
     }
+
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family: var(--sans);
       color:var(--text);
       background: var(--bg);
     }
+
     .wrap{
       max-width: 1180px;
       margin: 0 auto;
@@ -38,6 +38,7 @@
       gap: 18px;
       align-items:start;
     }
+
     header{
       max-width:1180px;
       margin: 0 auto;
@@ -48,11 +49,13 @@
       justify-content:space-between;
       flex-wrap:wrap;
     }
+
     h1{
       margin:0;
       font-size: 28px;
       letter-spacing:.2px;
     }
+
     .subtitle{
       color:var(--muted);
       font-size: 13px;
@@ -66,6 +69,7 @@
       align-items:center;
       justify-content:flex-end;
     }
+
     .chip{
       border:1px solid var(--line);
       background: var(--card);
@@ -77,7 +81,9 @@
       gap:10px;
       align-items:center;
     }
+
     .chip b{ font-weight:700; }
+
     .btn{
       cursor:pointer;
       border:1px solid var(--line);
@@ -92,14 +98,17 @@
       transition: transform .06s ease, border-color .15s ease, background .15s ease;
       user-select:none;
     }
+
     .btn:hover{ border-color: rgba(15,106,168,.35); background: #f8fbff; }
     .btn:active{ transform: translateY(1px); }
+
     .btn.primary{
       background: linear-gradient(180deg, var(--brand), var(--brand2));
       color:#fff;
-      border-color: rgba(0,0,0,0);
+      border-color: transparent;
       box-shadow: 0 10px 22px rgba(15,106,168,.22);
     }
+
     .btn.primary:hover{ filter: brightness(1.03); }
 
     .card{
@@ -109,6 +118,7 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+
     .card-h{
       padding: 14px 14px;
       border-bottom: 1px solid var(--line);
@@ -118,12 +128,14 @@
       gap:10px;
       flex-wrap:wrap;
     }
+
     .title{
       display:flex;
       align-items:center;
       gap:10px;
       font-weight:800;
     }
+
     .badge{
       background: linear-gradient(180deg, var(--brand), var(--brand2));
       color:#fff;
@@ -134,13 +146,13 @@
       white-space:nowrap;
     }
 
-    /* Tabs */
     .tabs{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
       align-items:center;
     }
+
     .tab{
       padding: 10px 12px;
       border-radius: 12px;
@@ -150,6 +162,7 @@
       font-size: 13px;
       user-select:none;
     }
+
     .tab.active{
       background: var(--pill);
       border-color: rgba(15,106,168,.28);
@@ -157,7 +170,6 @@
       font-weight: 800;
     }
 
-    /* Left column: timeline */
     .daybar{
       padding: 10px 14px;
       display:flex;
@@ -167,6 +179,7 @@
       border-bottom: 1px solid var(--line);
       background: #fbfdff;
     }
+
     select, input[type="text"]{
       border:1px solid var(--line);
       border-radius: 12px;
@@ -175,6 +188,7 @@
       outline:none;
       background:#fff;
     }
+
     input[type="text"]{ min-width: 240px; }
 
     .timeline{
@@ -182,15 +196,17 @@
       display:flex;
       flex-direction:column;
       gap: 12px;
-      max-height: calc(100vh - 220px);
+      max-height: calc(100vh - 250px);
       overflow:auto;
     }
+
     .slot{
       display:grid;
       grid-template-columns: 140px 1fr;
       gap: 12px;
       align-items:start;
     }
+
     .time{
       font-family: var(--mono);
       font-weight: 800;
@@ -199,12 +215,14 @@
       padding-top: 6px;
       white-space:nowrap;
     }
+
     .event{
       border: 2px solid rgba(15,106,168,.35);
       border-radius: 12px;
       background: #f6fbff;
       overflow:hidden;
     }
+
     .event .top{
       display:flex;
       align-items:center;
@@ -213,11 +231,13 @@
       padding: 12px 12px 10px;
       border-bottom: 1px solid rgba(15,106,168,.18);
     }
+
     .event .name{
       font-weight: 900;
       font-size: 14px;
       line-height: 1.2;
     }
+
     .event .tag{
       background: #dff0ff;
       border: 1px solid rgba(15,106,168,.20);
@@ -228,6 +248,7 @@
       color: var(--brand2);
       white-space:nowrap;
     }
+
     .event .body{
       padding: 10px 12px 12px;
       display:grid;
@@ -236,6 +257,7 @@
       font-size: 13px;
       color: var(--muted);
     }
+
     .row{
       display:flex;
       gap:10px;
@@ -243,24 +265,29 @@
       align-items:center;
       justify-content:space-between;
     }
+
     .meta{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
       align-items:center;
     }
+
     .kv{
       display:flex;
       gap:8px;
       align-items:center;
       white-space:nowrap;
     }
+
     .kv b{ color: var(--text); }
+
     .actions{
       display:flex;
       gap:8px;
       align-items:center;
     }
+
     .iconbtn{
       cursor:pointer;
       border:1px solid var(--line);
@@ -270,16 +297,18 @@
       font-size: 12px;
       user-select:none;
     }
+
     .iconbtn:hover{ border-color: rgba(15,106,168,.35); background:#f8fbff; }
 
-    /* Right column: calendar */
     .right{
       position: sticky;
       top: 12px;
     }
+
     .cal{
       padding: 14px;
     }
+
     .calhead{
       display:flex;
       align-items:center;
@@ -287,15 +316,18 @@
       gap:10px;
       margin-bottom: 10px;
     }
+
     .calhead .month{
       font-weight: 900;
       color: var(--brand2);
     }
+
     .grid{
       display:grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 8px;
     }
+
     .dow{
       font-size: 11px;
       font-weight: 800;
@@ -306,6 +338,7 @@
       border-radius: 8px;
       border:1px solid var(--line);
     }
+
     .cell{
       height: 44px;
       border-radius: 10px;
@@ -321,15 +354,19 @@
       position:relative;
       user-select:none;
     }
+
     .cell.muted{ opacity:.45; }
+
     .cell.today{
       outline: 3px solid rgba(15,106,168,.22);
       border-color: rgba(15,106,168,.35);
     }
+
     .cell.selected{
       background: #dff0ff;
       border-color: rgba(15,106,168,.40);
     }
+
     .dot{
       position:absolute;
       left: 6px;
@@ -340,6 +377,7 @@
       background: var(--brand);
       display:none;
     }
+
     .cell.has .dot{ display:block; }
 
     .sideactions{
@@ -347,15 +385,24 @@
       display:grid;
       gap:10px;
     }
+
     .sideactions .btn{ width:100%; justify-content:center; }
+
     .note{
       padding: 0 14px 14px;
       color: var(--muted);
       font-size: 12px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
-    /* Modal */
+    .status{
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 10px 18px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
     .modal-back{
       position:fixed;
       inset:0;
@@ -366,6 +413,7 @@
       padding: 18px;
       z-index: 20;
     }
+
     .modal{
       width: min(760px, 100%);
       background: #fff;
@@ -374,6 +422,7 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.25);
       overflow:hidden;
     }
+
     .modal-h{
       padding: 14px;
       display:flex;
@@ -384,12 +433,14 @@
       background: #fbfdff;
       font-weight: 900;
     }
+
     .modal-b{
       padding: 14px;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
+
     .field label{
       display:block;
       font-size: 12px;
@@ -397,6 +448,7 @@
       margin-bottom: 6px;
       font-weight: 800;
     }
+
     .field input, .field textarea, .field select{
       width:100%;
       border:1px solid var(--line);
@@ -406,7 +458,12 @@
       outline:none;
       background:#fff;
     }
-    textarea{ min-height: 92px; resize: vertical; }
+
+    textarea{
+      min-height: 92px;
+      resize: vertical;
+    }
+
     .modal-f{
       padding: 14px;
       border-top: 1px solid var(--line);
@@ -416,6 +473,7 @@
       flex-wrap:wrap;
       background: #fbfdff;
     }
+
     .modal-f .btn{ box-shadow:none; }
     .file{ display:none; }
 
@@ -433,19 +491,20 @@
   <header>
     <div>
       <h1>Расписание занятий</h1>
-      <div class="subtitle">Пары в вузе · Уроки/внеурочка · Личные задачи (всё редактируется и сохраняется локально)</div>
+      <div class="subtitle">GitHub Pages / локальное хранение / импорт и экспорт JSON</div>
     </div>
     <div class="chipbar">
       <span class="chip">Выбранная дата: <b id="chipDate">—</b></span>
       <button class="btn primary" id="btnAdd">➕ Добавить</button>
-      <button class="btn" id="btnExport">⬇️ Экспорт</button>
-      <button class="btn" id="btnImport">⬆️ Импорт</button>
+      <button class="btn" id="btnExport">⬇️ Экспорт JSON</button>
+      <button class="btn" id="btnImport">⬆️ Импорт JSON</button>
       <input class="file" id="fileImport" type="file" accept="application/json" />
     </div>
   </header>
 
+  <div class="status" id="statusText">Статус: загрузка...</div>
+
   <div class="wrap">
-    <!-- LEFT -->
     <div class="card">
       <div class="card-h">
         <div class="title">
@@ -465,12 +524,12 @@
         <select id="typeFilter" title="Фильтр по типу"></select>
         <input id="search" type="text" placeholder="Поиск: предмет / место / преподаватель / комментарий" />
         <button class="btn" id="btnToday">Сегодня</button>
+        <button class="btn" id="btnReloadBase">↺ Загрузить schedule.json</button>
       </div>
 
       <div class="timeline" id="timeline"></div>
     </div>
 
-    <!-- RIGHT -->
     <div class="right">
       <div class="card">
         <div class="card-h">
@@ -491,17 +550,17 @@
 
         <div class="sideactions">
           <button class="btn primary" id="btnAddFromDate">➕ Добавить на выбранный день</button>
-          <button class="btn" id="btnClear">🧹 Очистить (осторожно)</button>
+          <button class="btn" id="btnClear">🧹 Сбросить локальные данные</button>
         </div>
 
         <div class="note">
-          
+          Если рядом с <code>index.html</code> лежит файл <code>schedule.json</code>, сайт может загрузить его как стартовые данные.
+          Если файла нет или браузер блокирует <code>fetch</code>, сайт использует встроенные данные и продолжает работать.
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL -->
   <div class="modal-back" id="modalBack" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
       <div class="modal-h">
@@ -574,17 +633,8 @@
   </div>
 
   <script>
-    // ===== Data model =====
-    // Event:
-    // {
-    //   id, mode: 'uni'|'teach'|'tasks',
-    //   type, title, place, person, note,
-    //   dow: 1..7 (Mon..Sun),
-    //   date: 'YYYY-MM-DD' | '' (если разово),
-    //   start:'HH:MM', end:'HH:MM'
-    // }
-
-    const STORAGE_KEY = "my_schedule_v1";
+    const STORAGE_KEY = "my_schedule_v3";
+    const JSON_URL = "schedule.json";
 
     const DOW = [
       {n:1, k:"ПН", name:"Понедельник"},
@@ -603,11 +653,54 @@
       all: "Все"
     };
 
-    const el = (id)=>document.getElementById(id);
+    const MONTHS_RU = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
 
-    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+    const STARTER_EVENTS = [
+      {
+        id: "starter_vk_1",
+        mode: "uni",
+        type: "Военная кафедра",
+        title: "Военная кафедра",
+        place: "",
+        person: "",
+        note: "",
+        dow: 5,
+        date: "",
+        start: "08:30",
+        end: "17:10"
+      },
+      {
+        id: "starter_math_1",
+        mode: "teach",
+        type: "Внеурочка",
+        title: "Олимпиадная математика",
+        place: "",
+        person: "",
+        note: "",
+        dow: 3,
+        date: "",
+        start: "20:00",
+        end: "21:30"
+      }
+    ];
 
-    function pad2(n){ return String(n).padStart(2,"0"); }
+    const el = (id) => document.getElementById(id);
+
+    let events = [];
+    let mode = "uni";
+    let selectedDate = todayISO();
+    let selectedDow = dowFromDateISO(selectedDate);
+    let calYear, calMonth;
+    let editingId = null;
+    let currentSource = "unknown";
+
+    function uid(){
+      return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    }
+
+    function pad2(n){
+      return String(n).padStart(2, "0");
+    }
 
     function todayISO(){
       const d = new Date();
@@ -615,7 +708,6 @@
     }
 
     function dowFromDateISO(iso){
-      // JS getDay(): 0 Sun..6 Sat => map to 1..7 Mon..Sun
       const d = new Date(iso + "T00:00:00");
       const g = d.getDay();
       return g === 0 ? 7 : g;
@@ -623,13 +715,8 @@
 
     function hhmmToMin(t){
       if (!t) return 0;
-      const [h,m]=t.split(":").map(Number);
-      return (h||0)*60+(m||0);
-    }
-
-    function minToHHMM(m){
-      const h = Math.floor(m/60), mm = m%60;
-      return `${pad2(h)}:${pad2(mm)}`;
+      const [h, m] = t.split(":").map(Number);
+      return (h || 0) * 60 + (m || 0);
     }
 
     function escapeHtml(str){
@@ -641,128 +728,161 @@
         .replaceAll("'","&#039;");
     }
 
-    // ===== App state =====
-    let events = [];
-    let mode = "uni";         // uni | teach | tasks | all
-    let selectedDate = todayISO();
-    let selectedDow = dowFromDateISO(selectedDate);
+    function normalizeEvent(x){
+      const event = {
+        id: x.id || uid(),
+        mode: ["uni","teach","tasks"].includes(x.mode) ? x.mode : "tasks",
+        type: String(x.type || "Событие").trim() || "Событие",
+        title: String(x.title || "Без названия").trim() || "Без названия",
+        place: String(x.place || "").trim(),
+        person: String(x.person || "").trim(),
+        note: String(x.note || "").trim(),
+        dow: Number(x.dow || 1),
+        date: String(x.date || "").trim(),
+        start: String(x.start || "09:00"),
+        end: String(x.end || "10:00"),
+      };
 
-    // calendar month cursor
-    let calYear, calMonth; // month 0..11
+      if (event.date) {
+        event.dow = dowFromDateISO(event.date);
+      }
 
-    // modal state
-    let editingId = null;
-
-    // ===== Defaults (ваши уже добавлены) =====
-    function seedDefaultsIfEmpty(){
-      if (events.length) return;
-
-      events = [
-        {
-          id: uid(),
-          mode: "uni",
-          type: "Военная кафедра",
-          title: "Военная кафедра",
-          place: "",
-          person: "",
-          note: "",
-          dow: 5, // ПТ
-          date: "", // каждую пятницу
-          start: "08:30",
-          end: "17:10"
-        },
-        {
-          id: uid(),
-          mode: "teach",
-          type: "Внеурочка",
-          title: "Олимпиадная математика",
-          place: "",
-          person: "",
-          note: "",
-          dow: 3, // СР
-          date: "",
-          start: "20:00",
-          end: "21:30"
-        }
-      ];
-
-      save();
+      return event;
     }
 
-    // ===== Storage =====
-    function load(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        events = raw ? JSON.parse(raw) : [];
-      }catch(e){
-        events = [];
+    function setStatus(text){
+      el("statusText").textContent = text;
+    }
+
+    function updateStatusText(){
+      if (currentSource === "localStorage") {
+        setStatus("Статус: используются локальные данные из браузера");
+      } else if (currentSource === "schedule.json") {
+        setStatus("Статус: стартовые данные загружены из schedule.json");
+      } else if (currentSource === "starter") {
+        setStatus("Статус: schedule.json не загружен, используются встроенные данные");
+      } else {
+        setStatus("Статус: данные загружены");
       }
     }
-    function save(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+
+    function loadFromLocalStorage(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+
+        const parsed = JSON.parse(raw);
+        const arr = Array.isArray(parsed) ? parsed : parsed.events;
+        if (!Array.isArray(arr)) return false;
+
+        events = arr.map(normalizeEvent);
+        currentSource = "localStorage";
+        return true;
+      }catch{
+        return false;
+      }
     }
 
-    // ===== UI init =====
-    function initSelects(){
-      // daySelect
-      const daySelect = el("daySelect");
-      daySelect.innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
-      daySelect.value = String(selectedDow);
+    async function loadFromJSON(){
+      const isFileProtocol = location.protocol === "file:";
+      if (isFileProtocol) {
+        throw new Error("Файл открыт локально через file://, fetch для JSON может не работать");
+      }
 
-      // modal fDow
-      const fDow = el("fDow");
-      fDow.innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
+      const response = await fetch(JSON_URL, {
+        cache: "no-store"
+      });
 
-      // typeFilter
-      rebuildTypeFilter();
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      const arr = Array.isArray(data) ? data : data.events;
+
+      if (!Array.isArray(arr)) {
+        throw new Error("Неверный формат JSON");
+      }
+
+      events = arr.map(normalizeEvent);
+      currentSource = "schedule.json";
+      return true;
+    }
+
+    function loadStarterData(){
+      events = STARTER_EVENTS.map(normalizeEvent);
+      currentSource = "starter";
+    }
+
+    function save(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: 3,
+        updatedAt: new Date().toISOString(),
+        events
+      }));
+      currentSource = "localStorage";
+      updateStatusText();
     }
 
     function rebuildTypeFilter(){
       const typeFilter = el("typeFilter");
-      const types = Array.from(new Set(events.map(e=>e.type).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ru"));
+      const currentValue = typeFilter.value;
+      const types = Array.from(new Set(events.map(e => e.type).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ru"));
+
       typeFilter.innerHTML = [`<option value="">Все типы</option>`]
-        .concat(types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`))
+        .concat(types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`))
         .join("");
+
+      if (types.includes(currentValue)) {
+        typeFilter.value = currentValue;
+      } else {
+        typeFilter.value = "";
+      }
+    }
+
+    function initSelects(){
+      const daySelect = el("daySelect");
+      daySelect.innerHTML = DOW.map(d => `<option value="${d.n}">${d.name}</option>`).join("");
+      daySelect.value = String(selectedDow);
+
+      const fDow = el("fDow");
+      fDow.innerHTML = DOW.map(d => `<option value="${d.n}">${d.name}</option>`).join("");
+
+      rebuildTypeFilter();
     }
 
     function setTabs(){
-      document.querySelectorAll(".tab").forEach(t=>{
-        t.classList.toggle("active", t.dataset.mode===mode);
+      document.querySelectorAll(".tab").forEach(t => {
+        t.classList.toggle("active", t.dataset.mode === mode);
       });
       el("leftTitle").textContent = MODE_LABEL[mode] === "Все" ? "Все события" : `Раздел: ${MODE_LABEL[mode]}`;
     }
 
-    // ===== Render timeline =====
     function visibleEventsForDay(dow, dateISO){
       const q = el("search").value.trim().toLowerCase();
       const typeF = el("typeFilter").value;
+
       return events
-        .filter(e=>{
-          // mode filter
+        .filter(e => {
           if (mode !== "all" && e.mode !== mode) return false;
 
-          // date/dow match:
-          // if e.date set -> only that date
-          // else -> weekly by dow
-          if (e.date){
+          if (e.date) {
             if (e.date !== dateISO) return false;
           } else {
             if (Number(e.dow) !== Number(dow)) return false;
           }
 
-          // type filter
           if (typeF && e.type !== typeF) return false;
 
-          // search
           if (!q) return true;
           const hay = `${e.title} ${e.type} ${e.place} ${e.person} ${e.note}`.toLowerCase();
           return hay.includes(q);
         })
-        .sort((a,b)=>{
+        .sort((a, b) => {
           const sa = hhmmToMin(a.start);
           const sb = hhmmToMin(b.start);
           if (sa !== sb) return sa - sb;
-          return (a.title||"").localeCompare(b.title||"","ru");
+          return (a.title || "").localeCompare(b.title || "", "ru");
         });
     }
 
@@ -770,19 +890,18 @@
       const tl = el("timeline");
       const list = visibleEventsForDay(selectedDow, selectedDate);
 
-      // header chips
-      el("chipDate").textContent = `${selectedDate} · ${DOW.find(d=>d.n===selectedDow).name}`;
+      const dayName = DOW.find(d => d.n === selectedDow)?.name || "";
+      el("chipDate").textContent = `${selectedDate} · ${dayName}`;
 
-      // badge "Неделя / Дата"
-      const weeklyCount = list.filter(e=>!e.date).length;
-      const onceCount = list.filter(e=>!!e.date).length;
+      const onceCount = list.filter(e => !!e.date).length;
       el("badgeGroup").textContent = onceCount ? "Разовые + недельные" : "Неделя";
 
       if (!list.length){
         tl.innerHTML = `
           <div style="padding:12px;color:var(--muted);">
-            Ничего не запланировано на этот день. Нажмите <b>“Добавить”</b>.
-          </div>`;
+            Ничего не запланировано на этот день. Нажмите <b>«Добавить»</b>.
+          </div>
+        `;
         return;
       }
 
@@ -837,9 +956,6 @@
       tl.appendChild(frag);
     }
 
-    // ===== Calendar =====
-    const MONTHS_RU = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
-
     function setCalendarCursorFromSelected(){
       const d = new Date(selectedDate + "T00:00:00");
       calYear = d.getFullYear();
@@ -849,49 +965,40 @@
     function renderCalendar(){
       el("badgeMonth").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
       el("monthTitle").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
-
-      // DOW row
-      el("dowRow").innerHTML = DOW.map(d=>`<div class="dow">${d.k}</div>`).join("");
+      el("dowRow").innerHTML = DOW.map(d => `<div class="dow">${d.k}</div>`).join("");
 
       const grid = el("calGrid");
       grid.innerHTML = "";
 
       const first = new Date(calYear, calMonth, 1);
-      const startDay = (first.getDay() === 0) ? 7 : first.getDay(); // 1..7
-      const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+      const startDay = (first.getDay() === 0) ? 7 : first.getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
 
-      // show 6 weeks (42 cells)
       const cells = 42;
-      const startOffset = startDay - 1; // number of cells before day 1
+      const startOffset = startDay - 1;
       const today = todayISO();
 
-      for (let i=0;i<cells;i++){
+      for (let i = 0; i < cells; i++){
         const dayNum = i - startOffset + 1;
         const cell = document.createElement("div");
         cell.className = "cell";
 
         let iso = "";
-        let muted = false;
 
         if (dayNum < 1){
-          // previous month
           const prevDays = new Date(calYear, calMonth, 0).getDate();
           const d = prevDays + dayNum;
-          const dt = new Date(calYear, calMonth-1, d);
+          const dt = new Date(calYear, calMonth - 1, d);
           iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
-          muted = true;
           cell.classList.add("muted");
           cell.textContent = d;
         } else if (dayNum > daysInMonth){
-          // next month
           const d = dayNum - daysInMonth;
-          const dt = new Date(calYear, calMonth+1, d);
+          const dt = new Date(calYear, calMonth + 1, d);
           iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
-          muted = true;
           cell.classList.add("muted");
           cell.textContent = d;
         } else {
-          // current month
           const dt = new Date(calYear, calMonth, dayNum);
           iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
           cell.textContent = dayNum;
@@ -903,15 +1010,15 @@
         if (iso === today) cell.classList.add("today");
         if (iso === selectedDate) cell.classList.add("selected");
 
-        // dot if there are events on that date OR weekly events for its dow
         const dow = dowFromDateISO(iso);
-        const has = events.some(e=>{
+        const has = events.some(e => {
           if (e.date) return e.date === iso;
           return Number(e.dow) === Number(dow);
         });
+
         if (has) cell.classList.add("has");
 
-        cell.addEventListener("click", ()=>{
+        cell.addEventListener("click", () => {
           selectedDate = iso;
           selectedDow = dowFromDateISO(selectedDate);
           el("daySelect").value = String(selectedDow);
@@ -923,18 +1030,17 @@
       }
     }
 
-    // ===== Modal =====
-    function openModal(editId=null){
+    function openModal(editId = null){
       editingId = editId;
       const isEdit = !!editId;
 
       el("modalTitle").textContent = isEdit ? "Редактировать событие" : "Добавить событие";
       el("btnDelete").style.display = isEdit ? "inline-flex" : "none";
 
-      // fill fields
       if (isEdit){
-        const e = events.find(x=>x.id===editId);
+        const e = events.find(x => x.id === editId);
         if (!e) return;
+
         el("fMode").value = e.mode;
         el("fType").value = e.type || "";
         el("fDow").value = String(e.dow || selectedDow);
@@ -946,10 +1052,10 @@
         el("fPerson").value = e.person || "";
         el("fNote").value = e.note || "";
       } else {
-        el("fMode").value = (mode==="all") ? "uni" : mode;
+        el("fMode").value = (mode === "all") ? "uni" : mode;
         el("fType").value = "";
         el("fDow").value = String(selectedDow);
-        el("fDate").value = ""; // по умолчанию недельное
+        el("fDate").value = "";
         el("fStart").value = "09:00";
         el("fEnd").value = "10:00";
         el("fTitle").value = "";
@@ -959,17 +1065,17 @@
       }
 
       el("modalBack").style.display = "flex";
-      el("modalBack").setAttribute("aria-hidden","false");
+      el("modalBack").setAttribute("aria-hidden", "false");
     }
 
     function closeModal(){
       el("modalBack").style.display = "none";
-      el("modalBack").setAttribute("aria-hidden","true");
+      el("modalBack").setAttribute("aria-hidden", "true");
       editingId = null;
     }
 
     function saveModal(){
-      const e = {
+      const event = {
         id: editingId || uid(),
         mode: el("fMode").value,
         type: el("fType").value.trim() || "Событие",
@@ -983,22 +1089,20 @@
         end: el("fEnd").value || "10:00",
       };
 
-      // normalize: if date is set, dow can be derived but we keep it for convenience
-      if (e.date){
-        e.dow = dowFromDateISO(e.date);
+      if (event.date){
+        event.dow = dowFromDateISO(event.date);
       }
 
-      // validate time
-      if (hhmmToMin(e.end) <= hhmmToMin(e.start)){
+      if (hhmmToMin(event.end) <= hhmmToMin(event.start)){
         alert("Время конца должно быть позже времени начала.");
         return;
       }
 
       if (editingId){
-        const idx = events.findIndex(x=>x.id===editingId);
-        if (idx>=0) events[idx] = e;
+        const idx = events.findIndex(x => x.id === editingId);
+        if (idx >= 0) events[idx] = normalizeEvent(event);
       } else {
-        events.push(e);
+        events.push(normalizeEvent(event));
       }
 
       save();
@@ -1011,7 +1115,8 @@
     function deleteModal(){
       if (!editingId) return;
       if (!confirm("Удалить событие?")) return;
-      events = events.filter(x=>x.id!==editingId);
+
+      events = events.filter(x => x.id !== editingId);
       save();
       rebuildTypeFilter();
       renderCalendar();
@@ -1019,18 +1124,22 @@
       closeModal();
     }
 
-    // ===== Export/Import =====
     function exportJSON(){
       const payload = {
         version: 1,
         exportedAt: new Date().toISOString(),
         events
       };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json;charset=utf-8"});
+
+      const blob = new Blob(
+        [JSON.stringify(payload, null, 2)],
+        { type: "application/json;charset=utf-8" }
+      );
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "schedule-export.json";
+      a.download = "schedule.json";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -1040,32 +1149,42 @@
     async function importJSONFile(file){
       const text = await file.text();
       const obj = JSON.parse(text);
-      const incoming = Array.isArray(obj) ? obj : obj.events;
-      if (!Array.isArray(incoming)) throw new Error("Неверный формат JSON.");
-      // basic sanitization
-      events = incoming.map(x=>({
-        id: x.id || uid(),
-        mode: x.mode || "tasks",
-        type: x.type || "Событие",
-        title: x.title || "Без названия",
-        place: x.place || "",
-        person: x.person || "",
-        note: x.note || "",
-        dow: Number(x.dow || 1),
-        date: x.date || "",
-        start: x.start || "09:00",
-        end: x.end || "10:00",
-      }));
+      const arr = Array.isArray(obj) ? obj : obj.events;
+
+      if (!Array.isArray(arr)) {
+        throw new Error("Неверный формат JSON");
+      }
+
+      events = arr.map(normalizeEvent);
       save();
       rebuildTypeFilter();
       renderCalendar();
       renderTimeline();
     }
 
-    // ===== Events wiring =====
+    async function reloadBaseJSON(){
+      try {
+        await loadFromJSON();
+        localStorage.removeItem(STORAGE_KEY);
+        rebuildTypeFilter();
+        renderCalendar();
+        renderTimeline();
+        updateStatusText();
+      } catch (err) {
+        alert("Не удалось загрузить schedule.json. Проверь, что файл лежит рядом с index.html и сайт открыт через http/https, а не через file://");
+      }
+    }
+
+    function debounce(fn, ms){
+      let t = null;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
     function wire(){
-      // tabs
-      el("tabs").addEventListener("click", (ev)=>{
+      el("tabs").addEventListener("click", (ev) => {
         const t = ev.target.closest(".tab");
         if (!t) return;
         mode = t.dataset.mode;
@@ -1073,20 +1192,15 @@
         renderTimeline();
       });
 
-      // day select
-      el("daySelect").addEventListener("change", ()=>{
+      el("daySelect").addEventListener("change", () => {
         selectedDow = Number(el("daySelect").value);
-        // keep selectedDate in sync: choose nearest date in current calendar month with that dow
-        // simpler: do not change selectedDate automatically, only timeline filter uses dow+date
         renderTimeline();
       });
 
-      // search/type filter
       el("search").addEventListener("input", debounce(renderTimeline, 120));
       el("typeFilter").addEventListener("change", renderTimeline);
 
-      // today
-      el("btnToday").addEventListener("click", ()=>{
+      el("btnToday").addEventListener("click", () => {
         selectedDate = todayISO();
         selectedDow = dowFromDateISO(selectedDate);
         el("daySelect").value = String(selectedDow);
@@ -1095,96 +1209,105 @@
         renderTimeline();
       });
 
-      // timeline edit click
-      el("timeline").addEventListener("click", (ev)=>{
+      el("timeline").addEventListener("click", (ev) => {
         const b = ev.target.closest("[data-act='edit']");
         if (!b) return;
         openModal(b.dataset.id);
       });
 
-      // add buttons
-      el("btnAdd").addEventListener("click", ()=>openModal(null));
-      el("btnAddFromDate").addEventListener("click", ()=>{
+      el("btnAdd").addEventListener("click", () => openModal(null));
+
+      el("btnAddFromDate").addEventListener("click", () => {
         openModal(null);
-        // suggest "разово" on selected date (удобно)
         el("fDate").value = selectedDate;
         el("fDow").value = String(dowFromDateISO(selectedDate));
       });
 
-      // modal
       el("btnClose").addEventListener("click", closeModal);
       el("btnCancel").addEventListener("click", closeModal);
       el("btnSave").addEventListener("click", saveModal);
       el("btnDelete").addEventListener("click", deleteModal);
-      el("modalBack").addEventListener("click", (ev)=>{
+
+      el("modalBack").addEventListener("click", (ev) => {
         if (ev.target === el("modalBack")) closeModal();
       });
-      document.addEventListener("keydown", (ev)=>{
+
+      document.addEventListener("keydown", (ev) => {
         if (ev.key === "Escape") closeModal();
       });
 
-      // calendar nav
-      el("mPrev").addEventListener("click", ()=>{
+      el("mPrev").addEventListener("click", () => {
         calMonth -= 1;
-        if (calMonth < 0){ calMonth = 11; calYear -= 1; }
-        renderCalendar();
-      });
-      el("mNext").addEventListener("click", ()=>{
-        calMonth += 1;
-        if (calMonth > 11){ calMonth = 0; calYear += 1; }
+        if (calMonth < 0) {
+          calMonth = 11;
+          calYear -= 1;
+        }
         renderCalendar();
       });
 
-      // export/import
+      el("mNext").addEventListener("click", () => {
+        calMonth += 1;
+        if (calMonth > 11) {
+          calMonth = 0;
+          calYear += 1;
+        }
+        renderCalendar();
+      });
+
       el("btnExport").addEventListener("click", exportJSON);
-      el("btnImport").addEventListener("click", ()=>el("fileImport").click());
-      el("fileImport").addEventListener("change", async (ev)=>{
+
+      el("btnImport").addEventListener("click", () => {
+        el("fileImport").click();
+      });
+
+      el("fileImport").addEventListener("change", async (ev) => {
         const f = ev.target.files?.[0];
         if (!f) return;
-        try{
+
+        try {
           await importJSONFile(f);
-        }catch(err){
+        } catch (err) {
           alert("Ошибка импорта: " + (err?.message || err));
-        }finally{
+        } finally {
           ev.target.value = "";
         }
       });
 
-      // clear
-      el("btnClear").addEventListener("click", ()=>{
-        if (!confirm("Точно очистить ВСЕ события? Это удалит данные из браузера.")) return;
-        events = [];
-        save();
-        seedDefaultsIfEmpty();
+      el("btnReloadBase").addEventListener("click", reloadBaseJSON);
+
+      el("btnClear").addEventListener("click", () => {
+        if (!confirm("Удалить локальные данные из браузера?")) return;
+
+        localStorage.removeItem(STORAGE_KEY);
+        loadStarterData();
         rebuildTypeFilter();
         renderCalendar();
         renderTimeline();
+        updateStatusText();
       });
     }
 
-    function debounce(fn, ms){
-      let t=null;
-      return (...args)=>{
-        clearTimeout(t);
-        t=setTimeout(()=>fn(...args), ms);
-      };
-    }
-
-    // ===== Bootstrap =====
-    function boot(){
-      load();
-      seedDefaultsIfEmpty();
-
+    async function boot(){
       selectedDate = todayISO();
       selectedDow = dowFromDateISO(selectedDate);
 
+      const hasLocal = loadFromLocalStorage();
+
+      if (!hasLocal) {
+        try {
+          await loadFromJSON();
+        } catch (err) {
+          loadStarterData();
+        }
+      }
+
       initSelects();
       setTabs();
-
       setCalendarCursorFromSelected();
       renderCalendar();
       renderTimeline();
       wire();
+      updateStatusText();
     }
 
     boot();
