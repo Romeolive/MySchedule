@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Моё расписание</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
       --bg:#f3f6fb;
@@ -19,49 +20,90 @@
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
     }
-
     *{ box-sizing:border-box; }
+    body{ margin:0; font-family:var(--sans); color:var(--text); background:var(--bg); }
+    .hidden{ display:none !important; }
 
-    body{
-      margin:0;
-      font-family: var(--sans);
-      color:var(--text);
-      background: var(--bg);
-    }
-
-    .wrap{
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 18px;
+    .auth-wrap{
+      min-height:100vh;
       display:grid;
-      grid-template-columns: 1.65fr 1fr;
-      gap: 18px;
-      align-items:start;
+      place-items:center;
+      padding:18px;
     }
+    .auth-card{
+      width:min(460px,100%);
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .auth-head{
+      padding:20px;
+      border-bottom:1px solid var(--line);
+      background:#fbfdff;
+    }
+    .auth-head h1{ margin:0; font-size:28px; }
+    .auth-sub{ margin-top:8px; color:var(--muted); font-size:14px; }
+    .auth-body{ padding:20px; display:grid; gap:14px; }
+
+    .field label{
+      display:block;
+      margin-bottom:6px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--muted);
+    }
+    .field input, .field select, .field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:14px;
+      background:#fff;
+      outline:none;
+    }
+    textarea{ min-height:90px; resize:vertical; }
+
+    .btn{
+      cursor:pointer;
+      border:1px solid var(--line);
+      background:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .btn:hover{ border-color:rgba(15,106,168,.35); background:#f8fbff; }
+    .btn.primary{
+      background:linear-gradient(180deg, var(--brand), var(--brand2));
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 10px 22px rgba(15,106,168,.22);
+    }
+
+    .btn-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .status{ font-size:13px; color:var(--muted); }
+    .error{ color:#b91c1c; }
+    .ok{ color:#15803d; }
 
     header{
       max-width:1180px;
-      margin: 0 auto;
-      padding: 18px 18px 0;
+      margin:0 auto;
+      padding:18px 18px 0;
       display:flex;
       gap:12px;
       align-items:center;
       justify-content:space-between;
       flex-wrap:wrap;
     }
-
-    h1{
-      margin:0;
-      font-size: 28px;
-      letter-spacing:.2px;
-    }
-
-    .subtitle{
-      color:var(--muted);
-      font-size: 13px;
-      margin-top:6px;
-    }
-
+    h2{ margin:0; font-size:28px; }
+    .subtitle{ color:var(--muted); font-size:13px; margin-top:6px; }
     .chipbar{
       display:flex;
       gap:10px;
@@ -69,195 +111,139 @@
       align-items:center;
       justify-content:flex-end;
     }
-
     .chip{
       border:1px solid var(--line);
-      background: var(--card);
-      padding: 10px 12px;
-      border-radius: 999px;
-      box-shadow: 0 4px 14px rgba(13,42,82,.06);
-      font-size: 13px;
+      background:var(--card);
+      padding:10px 12px;
+      border-radius:999px;
+      box-shadow:0 4px 14px rgba(13,42,82,.06);
+      font-size:13px;
       display:flex;
       gap:10px;
       align-items:center;
     }
 
-    .chip b{ font-weight:700; }
-
-    .btn{
-      cursor:pointer;
-      border:1px solid var(--line);
-      background: var(--card);
-      padding: 10px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      box-shadow: 0 4px 14px rgba(13,42,82,.06);
-      transition: transform .06s ease, border-color .15s ease, background .15s ease;
-      user-select:none;
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:18px;
+      display:grid;
+      grid-template-columns:1.65fr 1fr;
+      gap:18px;
+      align-items:start;
     }
-
-    .btn:hover{ border-color: rgba(15,106,168,.35); background: #f8fbff; }
-    .btn:active{ transform: translateY(1px); }
-
-    .btn.primary{
-      background: linear-gradient(180deg, var(--brand), var(--brand2));
-      color:#fff;
-      border-color: transparent;
-      box-shadow: 0 10px 22px rgba(15,106,168,.22);
-    }
-
-    .btn.primary:hover{ filter: brightness(1.03); }
 
     .card{
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:var(--shadow);
       overflow:hidden;
     }
-
     .card-h{
-      padding: 14px 14px;
-      border-bottom: 1px solid var(--line);
+      padding:14px;
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
       flex-wrap:wrap;
     }
-
-    .title{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-    }
-
+    .title{ display:flex; align-items:center; gap:10px; font-weight:800; }
     .badge{
-      background: linear-gradient(180deg, var(--brand), var(--brand2));
+      background:linear-gradient(180deg, var(--brand), var(--brand2));
       color:#fff;
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding:10px 12px;
+      border-radius:12px;
       font-weight:800;
-      box-shadow: 0 10px 22px rgba(15,106,168,.22);
+      box-shadow:0 10px 22px rgba(15,106,168,.22);
       white-space:nowrap;
     }
 
-    .tabs{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .tab{
-      padding: 10px 12px;
-      border-radius: 12px;
+      padding:10px 12px;
+      border-radius:12px;
       border:1px solid var(--line);
-      background: #f7fbff;
+      background:#f7fbff;
       cursor:pointer;
-      font-size: 13px;
+      font-size:13px;
       user-select:none;
     }
-
     .tab.active{
-      background: var(--pill);
-      border-color: rgba(15,106,168,.28);
-      color: var(--brand2);
-      font-weight: 800;
+      background:var(--pill);
+      border-color:rgba(15,106,168,.28);
+      color:var(--brand2);
+      font-weight:800;
     }
 
     .daybar{
-      padding: 10px 14px;
+      padding:10px 14px;
       display:flex;
       gap:10px;
       flex-wrap:wrap;
       align-items:center;
-      border-bottom: 1px solid var(--line);
-      background: #fbfdff;
+      border-bottom:1px solid var(--line);
+      background:#fbfdff;
     }
-
-    select, input[type="text"]{
+    input[type="text"], select{
       border:1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 13px;
-      outline:none;
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:13px;
       background:#fff;
+      outline:none;
     }
-
-    input[type="text"]{ min-width: 240px; }
+    input[type="text"]{ min-width:240px; }
 
     .timeline{
-      padding: 14px;
+      padding:14px;
       display:flex;
       flex-direction:column;
-      gap: 12px;
-      max-height: calc(100vh - 250px);
+      gap:12px;
+      max-height:calc(100vh - 240px);
       overflow:auto;
     }
-
-    .slot{
-      display:grid;
-      grid-template-columns: 140px 1fr;
-      gap: 12px;
-      align-items:start;
-    }
-
+    .slot{ display:grid; grid-template-columns:140px 1fr; gap:12px; align-items:start; }
     .time{
-      font-family: var(--mono);
-      font-weight: 800;
-      color: var(--text);
-      font-size: 14px;
-      padding-top: 6px;
+      font-family:var(--mono);
+      font-weight:800;
+      font-size:14px;
+      padding-top:6px;
       white-space:nowrap;
     }
-
     .event{
-      border: 2px solid rgba(15,106,168,.35);
-      border-radius: 12px;
-      background: #f6fbff;
+      border:2px solid rgba(15,106,168,.35);
+      border-radius:12px;
+      background:#f6fbff;
       overflow:hidden;
     }
-
     .event .top{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      padding: 12px 12px 10px;
-      border-bottom: 1px solid rgba(15,106,168,.18);
+      padding:12px 12px 10px;
+      border-bottom:1px solid rgba(15,106,168,.18);
     }
-
-    .event .name{
-      font-weight: 900;
-      font-size: 14px;
-      line-height: 1.2;
-    }
-
+    .event .name{ font-weight:900; font-size:14px; line-height:1.2; }
     .event .tag{
-      background: #dff0ff;
-      border: 1px solid rgba(15,106,168,.20);
-      padding: 8px 10px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--brand2);
+      background:#dff0ff;
+      border:1px solid rgba(15,106,168,.20);
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:800;
+      color:var(--brand2);
       white-space:nowrap;
     }
-
     .event .body{
-      padding: 10px 12px 12px;
+      padding:10px 12px 12px;
       display:grid;
-      grid-template-columns: 1fr;
       gap:8px;
-      font-size: 13px;
-      color: var(--muted);
+      font-size:13px;
+      color:var(--muted);
     }
-
     .row{
       display:flex;
       gap:10px;
@@ -265,301 +251,236 @@
       align-items:center;
       justify-content:space-between;
     }
-
     .meta{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
       align-items:center;
     }
-
     .kv{
       display:flex;
       gap:8px;
       align-items:center;
       white-space:nowrap;
     }
+    .kv b{ color:var(--text); }
 
-    .kv b{ color: var(--text); }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .iconbtn{
-      cursor:pointer;
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 12px;
-      user-select:none;
-    }
-
-    .iconbtn:hover{ border-color: rgba(15,106,168,.35); background:#f8fbff; }
-
-    .right{
-      position: sticky;
-      top: 12px;
-    }
-
-    .cal{
-      padding: 14px;
-    }
-
+    .right{ position:sticky; top:12px; }
+    .cal{ padding:14px; }
     .calhead{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      margin-bottom: 10px;
+      margin-bottom:10px;
     }
-
-    .calhead .month{
-      font-weight: 900;
-      color: var(--brand2);
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 8px;
-    }
-
+    .calhead .month{ font-weight:900; color:var(--brand2); }
+    .grid{ display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; }
     .dow{
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--muted);
+      font-size:11px;
+      font-weight:800;
+      color:var(--muted);
       text-align:center;
-      padding: 6px 0;
-      background: #edf4ff;
-      border-radius: 8px;
+      padding:6px 0;
+      background:#edf4ff;
+      border-radius:8px;
       border:1px solid var(--line);
     }
-
     .cell{
-      height: 44px;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: #f7fbff;
+      height:44px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#f7fbff;
       display:flex;
       align-items:flex-end;
       justify-content:flex-end;
-      padding: 6px;
-      font-family: var(--mono);
-      font-size: 12px;
+      padding:6px;
+      font-family:var(--mono);
+      font-size:12px;
       cursor:pointer;
       position:relative;
       user-select:none;
     }
-
     .cell.muted{ opacity:.45; }
-
     .cell.today{
-      outline: 3px solid rgba(15,106,168,.22);
-      border-color: rgba(15,106,168,.35);
+      outline:3px solid rgba(15,106,168,.22);
+      border-color:rgba(15,106,168,.35);
     }
-
     .cell.selected{
-      background: #dff0ff;
-      border-color: rgba(15,106,168,.40);
+      background:#dff0ff;
+      border-color:rgba(15,106,168,.40);
     }
-
     .dot{
       position:absolute;
-      left: 6px;
-      top: 6px;
+      left:6px;
+      top:6px;
       width:8px;
       height:8px;
       border-radius:999px;
-      background: var(--brand);
+      background:var(--brand);
       display:none;
     }
-
     .cell.has .dot{ display:block; }
 
-    .sideactions{
-      padding: 0 14px 14px;
-      display:grid;
-      gap:10px;
-    }
-
-    .sideactions .btn{ width:100%; justify-content:center; }
-
+    .sideactions{ padding:0 14px 14px; display:grid; gap:10px; }
+    .sideactions .btn{ width:100%; }
     .note{
-      padding: 0 14px 14px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-    }
-
-    .status{
-      max-width: 1180px;
-      margin: 0 auto;
-      padding: 10px 18px 0;
-      color: var(--muted);
-      font-size: 13px;
+      padding:0 14px 14px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.45;
     }
 
     .modal-back{
       position:fixed;
       inset:0;
-      background: rgba(10,23,40,.45);
+      background:rgba(10,23,40,.45);
       display:none;
       align-items:center;
       justify-content:center;
-      padding: 18px;
-      z-index: 20;
+      padding:18px;
+      z-index:20;
     }
-
     .modal{
-      width: min(760px, 100%);
-      background: #fff;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      box-shadow: 0 18px 50px rgba(0,0,0,.25);
+      width:min(760px, 100%);
+      background:#fff;
+      border-radius:16px;
+      border:1px solid var(--line);
+      box-shadow:0 18px 50px rgba(0,0,0,.25);
       overflow:hidden;
     }
-
     .modal-h{
-      padding: 14px;
+      padding:14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      border-bottom: 1px solid var(--line);
-      background: #fbfdff;
-      font-weight: 900;
+      border-bottom:1px solid var(--line);
+      background:#fbfdff;
+      font-weight:900;
     }
-
     .modal-b{
-      padding: 14px;
+      padding:14px;
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
-
-    .field label{
-      display:block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      font-weight: 800;
-    }
-
-    .field input, .field textarea, .field select{
-      width:100%;
-      border:1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px 12px;
-      font-size: 13px;
-      outline:none;
-      background:#fff;
-    }
-
-    textarea{
-      min-height: 92px;
-      resize: vertical;
-    }
-
     .modal-f{
-      padding: 14px;
-      border-top: 1px solid var(--line);
+      padding:14px;
+      border-top:1px solid var(--line);
       display:flex;
       gap:10px;
       justify-content:flex-end;
       flex-wrap:wrap;
-      background: #fbfdff;
+      background:#fbfdff;
     }
 
-    .modal-f .btn{ box-shadow:none; }
-    .file{ display:none; }
-
-    @media (max-width: 980px){
-      .wrap{ grid-template-columns: 1fr; }
-      .right{ position: static; }
-      .timeline{ max-height: unset; }
-      .modal-b{ grid-template-columns: 1fr; }
-      input[type="text"]{ min-width: 180px; width: 100%; }
+    @media (max-width:980px){
+      .wrap{ grid-template-columns:1fr; }
+      .right{ position:static; }
+      .timeline{ max-height:unset; }
+      .modal-b{ grid-template-columns:1fr; }
+      input[type="text"]{ min-width:180px; width:100%; }
       .daybar{ align-items:stretch; }
+      .btn-row{ grid-template-columns:1fr; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Расписание занятий</h1>
-      <div class="subtitle">GitHub Pages / локальное хранение / импорт и экспорт JSON</div>
-    </div>
-    <div class="chipbar">
-      <span class="chip">Выбранная дата: <b id="chipDate">—</b></span>
-      <button class="btn primary" id="btnAdd">➕ Добавить</button>
-      <button class="btn" id="btnExport">⬇️ Экспорт JSON</button>
-      <button class="btn" id="btnImport">⬆️ Импорт JSON</button>
-      <input class="file" id="fileImport" type="file" accept="application/json" />
-    </div>
-  </header>
-
-  <div class="status" id="statusText">Статус: загрузка...</div>
-
-  <div class="wrap">
-    <div class="card">
-      <div class="card-h">
-        <div class="title">
-          <span class="badge" id="badgeGroup">Неделя</span>
-          <span id="leftTitle">Мои события</span>
-        </div>
-        <div class="tabs" id="tabs">
-          <div class="tab active" data-mode="uni">Вуз</div>
-          <div class="tab" data-mode="teach">Мои занятия</div>
-          <div class="tab" data-mode="tasks">Задачи</div>
-          <div class="tab" data-mode="all">Все</div>
-        </div>
+  <section id="authScreen" class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-head">
+        <h1>Вход</h1>
+        <div class="auth-sub">Регистрация и вход через Supabase</div>
       </div>
-
-      <div class="daybar">
-        <select id="daySelect" title="День недели"></select>
-        <select id="typeFilter" title="Фильтр по типу"></select>
-        <input id="search" type="text" placeholder="Поиск: предмет / место / преподаватель / комментарий" />
-        <button class="btn" id="btnToday">Сегодня</button>
-        <button class="btn" id="btnReloadBase">↺ Загрузить schedule.json</button>
+      <div class="auth-body">
+        <div class="field">
+          <label>Email</label>
+          <input id="authEmail" type="email" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label>Пароль</label>
+          <input id="authPassword" type="password" placeholder="Минимум 6 символов" />
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="btnRegister">Зарегистрироваться</button>
+          <button class="btn" id="btnLogin">Войти</button>
+        </div>
+        <div id="authStatus" class="status">Не авторизован</div>
       </div>
-
-      <div class="timeline" id="timeline"></div>
     </div>
+  </section>
 
-    <div class="right">
+  <section id="appScreen" class="hidden">
+    <header>
+      <div>
+        <h2>Расписание занятий</h2>
+        <div class="subtitle">Данные хранятся в Supabase и привязаны к аккаунту</div>
+      </div>
+      <div class="chipbar">
+        <span class="chip">Пользователь: <b id="chipUser">—</b></span>
+        <span class="chip">Выбранная дата: <b id="chipDate">—</b></span>
+        <button class="btn primary" id="btnAdd">➕ Добавить</button>
+        <button class="btn" id="btnExport">⬇️ Экспорт JSON</button>
+        <button class="btn" id="btnLogout">Выйти</button>
+      </div>
+    </header>
+
+    <div class="wrap">
       <div class="card">
         <div class="card-h">
-          <div class="title">Календарь</div>
-          <div class="badge" id="badgeMonth">—</div>
+          <div class="title">
+            <span class="badge" id="badgeGroup">Неделя</span>
+            <span id="leftTitle">Мои события</span>
+          </div>
+          <div class="tabs" id="tabs">
+            <div class="tab active" data-mode="uni">Вуз</div>
+            <div class="tab" data-mode="teach">Мои занятия</div>
+            <div class="tab" data-mode="tasks">Задачи</div>
+            <div class="tab" data-mode="all">Все</div>
+          </div>
         </div>
 
-        <div class="cal">
-          <div class="calhead">
-            <button class="btn" id="mPrev">◀</button>
-            <div class="month" id="monthTitle">—</div>
-            <button class="btn" id="mNext">▶</button>
+        <div class="daybar">
+          <select id="daySelect"></select>
+          <select id="typeFilter"></select>
+          <input id="search" type="text" placeholder="Поиск: предмет / место / преподаватель / комментарий" />
+          <button class="btn" id="btnToday">Сегодня</button>
+          <span id="dataStatus" class="status">Загрузка...</span>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+      </div>
+
+      <div class="right">
+        <div class="card">
+          <div class="card-h">
+            <div class="title">Календарь</div>
+            <div class="badge" id="badgeMonth">—</div>
           </div>
 
-          <div class="grid" id="dowRow"></div>
-          <div class="grid" id="calGrid" style="margin-top:8px;"></div>
-        </div>
+          <div class="cal">
+            <div class="calhead">
+              <button class="btn" id="mPrev">◀</button>
+              <div class="month" id="monthTitle">—</div>
+              <button class="btn" id="mNext">▶</button>
+            </div>
 
-        <div class="sideactions">
-          <button class="btn primary" id="btnAddFromDate">➕ Добавить на выбранный день</button>
-          <button class="btn" id="btnClear">🧹 Сбросить локальные данные</button>
-        </div>
+            <div class="grid" id="dowRow"></div>
+            <div class="grid" id="calGrid" style="margin-top:8px;"></div>
+          </div>
 
-        <div class="note">
-          Если рядом с <code>index.html</code> лежит файл <code>schedule.json</code>, сайт может загрузить его как стартовые данные.
-          Если файла нет или браузер блокирует <code>fetch</code>, сайт использует встроенные данные и продолжает работать.
+          <div class="sideactions">
+            <button class="btn primary" id="btnAddFromDate">➕ Добавить на выбранный день</button>
+          </div>
+
+          <div class="note">
+            Каждый пользователь видит только свои записи благодаря Row Level Security.
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 
   <div class="modal-back" id="modalBack" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true">
@@ -579,8 +500,8 @@
         </div>
 
         <div class="field">
-          <label>Тип (ярлык справа)</label>
-          <input id="fType" placeholder="например: Лекционная / Практика / Внеурочка / Дело" />
+          <label>Тип</label>
+          <input id="fType" placeholder="Лекция / Практика / Внеурочка / Дело" />
         </div>
 
         <div class="field">
@@ -589,7 +510,7 @@
         </div>
 
         <div class="field">
-          <label>Дата (опционально, если разово)</label>
+          <label>Дата (если разово)</label>
           <input id="fDate" type="date" />
         </div>
 
@@ -603,22 +524,22 @@
           <input id="fEnd" type="time" />
         </div>
 
-        <div class="field" style="grid-column: 1 / -1;">
+        <div class="field" style="grid-column:1 / -1;">
           <label>Название</label>
-          <input id="fTitle" placeholder="например: Архитектура ЭВМ / Олимпиадная математика / Военная кафедра" />
+          <input id="fTitle" placeholder="Название события" />
         </div>
 
         <div class="field">
           <label>Место / аудитория</label>
-          <input id="fPlace" placeholder="например: ауд. 218 / онлайн / корпус" />
+          <input id="fPlace" placeholder="ауд. 218 / онлайн / корпус" />
         </div>
 
         <div class="field">
           <label>Преподаватель / для кого</label>
-          <input id="fPerson" placeholder="например: ФИО / группа / класс" />
+          <input id="fPerson" placeholder="ФИО / группа / класс" />
         </div>
 
-        <div class="field" style="grid-column: 1 / -1;">
+        <div class="field" style="grid-column:1 / -1;">
           <label>Комментарий</label>
           <textarea id="fNote" placeholder="любые детали"></textarea>
         </div>
@@ -633,8 +554,10 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "my_schedule_v3";
-    const JSON_URL = "schedule.json";
+    const SUPABASE_URL = "https://ezvttsxoecaiiitfublh.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Qo37PWiuwljqolAzcCb6DQ_pqF6aeVm";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
     const DOW = [
       {n:1, k:"ПН", name:"Понедельник"},
@@ -646,18 +569,10 @@
       {n:7, k:"ВС", name:"Воскресенье"},
     ];
 
-    const MODE_LABEL = {
-      uni: "Вуз",
-      teach: "Мои занятия",
-      tasks: "Задачи",
-      all: "Все"
-    };
-
+    const MODE_LABEL = { uni:"Вуз", teach:"Мои занятия", tasks:"Задачи", all:"Все" };
     const MONTHS_RU = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
-
     const STARTER_EVENTS = [
       {
-        id: "starter_vk_1",
         mode: "uni",
         type: "Военная кафедра",
         title: "Военная кафедра",
@@ -670,7 +585,6 @@
         end: "17:10"
       },
       {
-        id: "starter_math_1",
         mode: "teach",
         type: "Внеурочка",
         title: "Олимпиадная математика",
@@ -687,38 +601,30 @@
     const el = (id) => document.getElementById(id);
 
     let events = [];
+    let currentUser = null;
     let mode = "uni";
     let selectedDate = todayISO();
     let selectedDow = dowFromDateISO(selectedDate);
     let calYear, calMonth;
     let editingId = null;
-    let currentSource = "unknown";
+    let wired = false;
 
-    function uid(){
-      return Math.random().toString(16).slice(2) + Date.now().toString(16);
-    }
-
-    function pad2(n){
-      return String(n).padStart(2, "0");
-    }
-
+    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+    function pad2(n){ return String(n).padStart(2, "0"); }
     function todayISO(){
       const d = new Date();
       return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
     }
-
     function dowFromDateISO(iso){
       const d = new Date(iso + "T00:00:00");
       const g = d.getDay();
       return g === 0 ? 7 : g;
     }
-
     function hhmmToMin(t){
       if (!t) return 0;
-      const [h, m] = t.split(":").map(Number);
-      return (h || 0) * 60 + (m || 0);
+      const [h,m] = t.split(":").map(Number);
+      return (h||0)*60+(m||0);
     }
-
     function escapeHtml(str){
       return String(str ?? "")
         .replaceAll("&","&amp;")
@@ -727,9 +633,16 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
-
+    function setAuthStatus(text, cls=""){
+      const node = el("authStatus");
+      node.className = `status ${cls}`.trim();
+      node.textContent = text;
+    }
+    function setDataStatus(text){
+      el("dataStatus").textContent = text;
+    }
     function normalizeEvent(x){
-      const event = {
+      const e = {
         id: x.id || uid(),
         mode: ["uni","teach","tasks"].includes(x.mode) ? x.mode : "tasks",
         type: String(x.type || "Событие").trim() || "Событие",
@@ -738,122 +651,198 @@
         person: String(x.person || "").trim(),
         note: String(x.note || "").trim(),
         dow: Number(x.dow || 1),
-        date: String(x.date || "").trim(),
+        date: x.date ? String(x.date) : "",
         start: String(x.start || "09:00"),
         end: String(x.end || "10:00"),
       };
-
-      if (event.date) {
-        event.dow = dowFromDateISO(event.date);
-      }
-
-      return event;
+      if (e.date) e.dow = dowFromDateISO(e.date);
+      return e;
     }
 
-    function setStatus(text){
-      el("statusText").textContent = text;
-    }
+    async function register(){
+      const email = el("authEmail").value.trim();
+      const password = el("authPassword").value;
 
-    function updateStatusText(){
-      if (currentSource === "localStorage") {
-        setStatus("Статус: используются локальные данные из браузера");
-      } else if (currentSource === "schedule.json") {
-        setStatus("Статус: стартовые данные загружены из schedule.json");
-      } else if (currentSource === "starter") {
-        setStatus("Статус: schedule.json не загружен, используются встроенные данные");
-      } else {
-        setStatus("Статус: данные загружены");
+      if (!email || !password) {
+        setAuthStatus("Заполни email и пароль", "error");
+        return;
       }
-    }
-
-    function loadFromLocalStorage(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return false;
-
-        const parsed = JSON.parse(raw);
-        const arr = Array.isArray(parsed) ? parsed : parsed.events;
-        if (!Array.isArray(arr)) return false;
-
-        events = arr.map(normalizeEvent);
-        currentSource = "localStorage";
-        return true;
-      }catch{
-        return false;
-      }
-    }
-
-    async function loadFromJSON(){
-      const isFileProtocol = location.protocol === "file:";
-      if (isFileProtocol) {
-        throw new Error("Файл открыт локально через file://, fetch для JSON может не работать");
+      if (password.length < 6) {
+        setAuthStatus("Пароль должен быть не короче 6 символов", "error");
+        return;
       }
 
-      const response = await fetch(JSON_URL, {
-        cache: "no-store"
-      });
+      setAuthStatus("Регистрация...", "");
+      const { error } = await supabase.auth.signUp({ email, password });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+      if (error) {
+        setAuthStatus(error.message, "error");
+        return;
       }
 
-      const data = await response.json();
-      const arr = Array.isArray(data) ? data : data.events;
+      setAuthStatus("Регистрация выполнена. Подтверди email по письму, затем войди.", "ok");
+    }
 
-      if (!Array.isArray(arr)) {
-        throw new Error("Неверный формат JSON");
+    async function login(){
+      const email = el("authEmail").value.trim();
+      const password = el("authPassword").value;
+
+      if (!email || !password) {
+        setAuthStatus("Заполни email и пароль", "error");
+        return;
       }
 
-      events = arr.map(normalizeEvent);
-      currentSource = "schedule.json";
-      return true;
+      setAuthStatus("Вход...", "");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        setAuthStatus(error.message, "error");
+        return;
+      }
+
+      setAuthStatus("Вход выполнен", "ok");
     }
 
-    function loadStarterData(){
-      events = STARTER_EVENTS.map(normalizeEvent);
-      currentSource = "starter";
+    async function logout(){
+      await supabase.auth.signOut();
     }
 
-    function save(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        version: 3,
-        updatedAt: new Date().toISOString(),
-        events
+    async function getCurrentUser(){
+      const { data, error } = await supabase.auth.getUser();
+      if (error) return null;
+      return data.user || null;
+    }
+
+    async function seedStarterEventsForNewUser(){
+      if (!currentUser) return;
+      const { count, error } = await supabase
+        .from("events")
+        .select("*", { count: "exact", head: true });
+
+      if (error) return;
+      if ((count || 0) > 0) return;
+
+      const payload = STARTER_EVENTS.map(e => ({
+        user_id: currentUser.id,
+        mode: e.mode,
+        type: e.type,
+        title: e.title,
+        place: e.place,
+        person: e.person,
+        note: e.note,
+        dow: e.dow,
+        date: e.date || null,
+        start: e.start,
+        end: e.end
       }));
-      currentSource = "localStorage";
-      updateStatusText();
+
+      await supabase.from("events").insert(payload);
+    }
+
+    async function loadEvents(){
+      if (!currentUser) return;
+
+      setDataStatus("Загрузка событий...");
+
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .order("date", { ascending: true })
+        .order("dow", { ascending: true })
+        .order("start", { ascending: true });
+
+      if (error) {
+        setDataStatus("Ошибка загрузки");
+        alert("Ошибка загрузки событий: " + error.message);
+        return;
+      }
+
+      events = (data || []).map(normalizeEvent);
+      rebuildTypeFilter();
+      renderCalendar();
+      renderTimeline();
+      setDataStatus(`Событий: ${events.length}`);
+    }
+
+    async function insertEvent(e){
+      const payload = {
+        user_id: currentUser.id,
+        mode: e.mode,
+        type: e.type,
+        title: e.title,
+        place: e.place,
+        person: e.person,
+        note: e.note,
+        dow: e.dow,
+        date: e.date || null,
+        start: e.start,
+        end: e.end
+      };
+
+      const { data, error } = await supabase
+        .from("events")
+        .insert(payload)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return normalizeEvent(data);
+    }
+
+    async function updateEvent(e){
+      const payload = {
+        mode: e.mode,
+        type: e.type,
+        title: e.title,
+        place: e.place,
+        person: e.person,
+        note: e.note,
+        dow: e.dow,
+        date: e.date || null,
+        start: e.start,
+        end: e.end
+      };
+
+      const { data, error } = await supabase
+        .from("events")
+        .update(payload)
+        .eq("id", e.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return normalizeEvent(data);
+    }
+
+    async function removeEvent(id){
+      const { error } = await supabase
+        .from("events")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    }
+
+    function initSelects(){
+      el("daySelect").innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
+      el("daySelect").value = String(selectedDow);
+      el("fDow").innerHTML = DOW.map(d=>`<option value="${d.n}">${d.name}</option>`).join("");
+      rebuildTypeFilter();
     }
 
     function rebuildTypeFilter(){
       const typeFilter = el("typeFilter");
-      const currentValue = typeFilter.value;
-      const types = Array.from(new Set(events.map(e => e.type).filter(Boolean))).sort((a, b) => a.localeCompare(b, "ru"));
-
+      const current = typeFilter.value;
+      const types = Array.from(new Set(events.map(e=>e.type).filter(Boolean))).sort((a,b)=>a.localeCompare(b,"ru"));
       typeFilter.innerHTML = [`<option value="">Все типы</option>`]
-        .concat(types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`))
+        .concat(types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`))
         .join("");
-
-      if (types.includes(currentValue)) {
-        typeFilter.value = currentValue;
-      } else {
-        typeFilter.value = "";
-      }
-    }
-
-    function initSelects(){
-      const daySelect = el("daySelect");
-      daySelect.innerHTML = DOW.map(d => `<option value="${d.n}">${d.name}</option>`).join("");
-      daySelect.value = String(selectedDow);
-
-      const fDow = el("fDow");
-      fDow.innerHTML = DOW.map(d => `<option value="${d.n}">${d.name}</option>`).join("");
-
-      rebuildTypeFilter();
+      if (types.includes(current)) typeFilter.value = current;
     }
 
     function setTabs(){
-      document.querySelectorAll(".tab").forEach(t => {
-        t.classList.toggle("active", t.dataset.mode === mode);
+      document.querySelectorAll(".tab").forEach(t=>{
+        t.classList.toggle("active", t.dataset.mode===mode);
       });
       el("leftTitle").textContent = MODE_LABEL[mode] === "Все" ? "Все события" : `Раздел: ${MODE_LABEL[mode]}`;
     }
@@ -863,7 +852,7 @@
       const typeF = el("typeFilter").value;
 
       return events
-        .filter(e => {
+        .filter(e=>{
           if (mode !== "all" && e.mode !== mode) return false;
 
           if (e.date) {
@@ -878,11 +867,10 @@
           const hay = `${e.title} ${e.type} ${e.place} ${e.person} ${e.note}`.toLowerCase();
           return hay.includes(q);
         })
-        .sort((a, b) => {
-          const sa = hhmmToMin(a.start);
-          const sb = hhmmToMin(b.start);
+        .sort((a,b)=>{
+          const sa = hhmmToMin(a.start), sb = hhmmToMin(b.start);
           if (sa !== sb) return sa - sb;
-          return (a.title || "").localeCompare(b.title || "", "ru");
+          return (a.title||"").localeCompare(b.title||"","ru");
         });
     }
 
@@ -890,18 +878,12 @@
       const tl = el("timeline");
       const list = visibleEventsForDay(selectedDow, selectedDate);
 
-      const dayName = DOW.find(d => d.n === selectedDow)?.name || "";
-      el("chipDate").textContent = `${selectedDate} · ${dayName}`;
-
-      const onceCount = list.filter(e => !!e.date).length;
+      el("chipDate").textContent = `${selectedDate} · ${DOW.find(d=>d.n===selectedDow).name}`;
+      const onceCount = list.filter(e=>!!e.date).length;
       el("badgeGroup").textContent = onceCount ? "Разовые + недельные" : "Неделя";
 
       if (!list.length){
-        tl.innerHTML = `
-          <div style="padding:12px;color:var(--muted);">
-            Ничего не запланировано на этот день. Нажмите <b>«Добавить»</b>.
-          </div>
-        `;
+        tl.innerHTML = `<div style="padding:12px;color:var(--muted);">Ничего не запланировано на этот день.</div>`;
         return;
       }
 
@@ -922,12 +904,9 @@
         const top = document.createElement("div");
         top.className = "top";
         top.innerHTML = `
-          <div class="name">${escapeHtml(e.title || "Без названия")}</div>
-          <div class="tag">${escapeHtml(e.type || "Событие")}</div>
+          <div class="name">${escapeHtml(e.title)}</div>
+          <div class="tag">${escapeHtml(e.type)}</div>
         `;
-
-        const body = document.createElement("div");
-        body.className = "body";
 
         const meta = [];
         if (e.place) meta.push(`<span class="kv">📍 <b>${escapeHtml(e.place)}</b></span>`);
@@ -935,19 +914,18 @@
         meta.push(`<span class="kv">🧩 <b>${escapeHtml(MODE_LABEL[e.mode] || e.mode)}</b></span>`);
         if (e.date) meta.push(`<span class="kv">📅 <b>${escapeHtml(e.date)}</b></span>`);
 
+        const body = document.createElement("div");
+        body.className = "body";
         body.innerHTML = `
           <div class="row">
             <div class="meta">${meta.join("")}</div>
-            <div class="actions">
-              <button class="iconbtn" data-act="edit" data-id="${e.id}">✏️ Редактировать</button>
-            </div>
+            <div><button class="btn" data-act="edit" data-id="${e.id}">✏️ Редактировать</button></div>
           </div>
           ${e.note ? `<div>📝 ${escapeHtml(e.note)}</div>` : ``}
         `;
 
         card.appendChild(top);
         card.appendChild(body);
-
         slot.appendChild(time);
         slot.appendChild(card);
         frag.appendChild(slot);
@@ -965,36 +943,34 @@
     function renderCalendar(){
       el("badgeMonth").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
       el("monthTitle").textContent = `${MONTHS_RU[calMonth]} ${calYear}`;
-      el("dowRow").innerHTML = DOW.map(d => `<div class="dow">${d.k}</div>`).join("");
+      el("dowRow").innerHTML = DOW.map(d=>`<div class="dow">${d.k}</div>`).join("");
 
       const grid = el("calGrid");
       grid.innerHTML = "";
 
       const first = new Date(calYear, calMonth, 1);
-      const startDay = (first.getDay() === 0) ? 7 : first.getDay();
-      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-
+      const startDay = first.getDay() === 0 ? 7 : first.getDay();
+      const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
       const cells = 42;
       const startOffset = startDay - 1;
       const today = todayISO();
 
-      for (let i = 0; i < cells; i++){
+      for (let i=0;i<cells;i++){
         const dayNum = i - startOffset + 1;
         const cell = document.createElement("div");
         cell.className = "cell";
-
         let iso = "";
 
         if (dayNum < 1){
           const prevDays = new Date(calYear, calMonth, 0).getDate();
           const d = prevDays + dayNum;
-          const dt = new Date(calYear, calMonth - 1, d);
+          const dt = new Date(calYear, calMonth-1, d);
           iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
           cell.classList.add("muted");
           cell.textContent = d;
         } else if (dayNum > daysInMonth){
           const d = dayNum - daysInMonth;
-          const dt = new Date(calYear, calMonth + 1, d);
+          const dt = new Date(calYear, calMonth+1, d);
           iso = `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
           cell.classList.add("muted");
           cell.textContent = d;
@@ -1011,14 +987,10 @@
         if (iso === selectedDate) cell.classList.add("selected");
 
         const dow = dowFromDateISO(iso);
-        const has = events.some(e => {
-          if (e.date) return e.date === iso;
-          return Number(e.dow) === Number(dow);
-        });
-
+        const has = events.some(e => e.date ? e.date === iso : Number(e.dow) === Number(dow));
         if (has) cell.classList.add("has");
 
-        cell.addEventListener("click", () => {
+        cell.addEventListener("click", ()=>{
           selectedDate = iso;
           selectedDow = dowFromDateISO(selectedDate);
           el("daySelect").value = String(selectedDow);
@@ -1030,7 +1002,7 @@
       }
     }
 
-    function openModal(editId = null){
+    function openModal(editId=null){
       editingId = editId;
       const isEdit = !!editId;
 
@@ -1038,19 +1010,18 @@
       el("btnDelete").style.display = isEdit ? "inline-flex" : "none";
 
       if (isEdit){
-        const e = events.find(x => x.id === editId);
+        const e = events.find(x=>x.id===editId);
         if (!e) return;
-
         el("fMode").value = e.mode;
-        el("fType").value = e.type || "";
-        el("fDow").value = String(e.dow || selectedDow);
+        el("fType").value = e.type;
+        el("fDow").value = String(e.dow);
         el("fDate").value = e.date || "";
-        el("fStart").value = e.start || "09:00";
-        el("fEnd").value = e.end || "10:00";
-        el("fTitle").value = e.title || "";
-        el("fPlace").value = e.place || "";
-        el("fPerson").value = e.person || "";
-        el("fNote").value = e.note || "";
+        el("fStart").value = e.start;
+        el("fEnd").value = e.end;
+        el("fTitle").value = e.title;
+        el("fPlace").value = e.place;
+        el("fPerson").value = e.person;
+        el("fNote").value = e.note;
       } else {
         el("fMode").value = (mode === "all") ? "uni" : mode;
         el("fType").value = "";
@@ -1065,18 +1036,16 @@
       }
 
       el("modalBack").style.display = "flex";
-      el("modalBack").setAttribute("aria-hidden", "false");
     }
 
     function closeModal(){
       el("modalBack").style.display = "none";
-      el("modalBack").setAttribute("aria-hidden", "true");
       editingId = null;
     }
 
-    function saveModal(){
-      const event = {
-        id: editingId || uid(),
+    async function saveModal(){
+      const e = normalizeEvent({
+        id: editingId || undefined,
         mode: el("fMode").value,
         type: el("fType").value.trim() || "Событие",
         title: el("fTitle").value.trim() || "Без названия",
@@ -1087,104 +1056,85 @@
         date: el("fDate").value || "",
         start: el("fStart").value || "09:00",
         end: el("fEnd").value || "10:00",
-      };
+      });
 
-      if (event.date){
-        event.dow = dowFromDateISO(event.date);
-      }
-
-      if (hhmmToMin(event.end) <= hhmmToMin(event.start)){
+      if (hhmmToMin(e.end) <= hhmmToMin(e.start)){
         alert("Время конца должно быть позже времени начала.");
         return;
       }
 
-      if (editingId){
-        const idx = events.findIndex(x => x.id === editingId);
-        if (idx >= 0) events[idx] = normalizeEvent(event);
-      } else {
-        events.push(normalizeEvent(event));
-      }
+      try{
+        setDataStatus("Сохранение...");
 
-      save();
-      rebuildTypeFilter();
-      renderCalendar();
-      renderTimeline();
-      closeModal();
+        if (editingId){
+          const updated = await updateEvent(e);
+          const idx = events.findIndex(x=>x.id===updated.id);
+          if (idx >= 0) events[idx] = updated;
+        } else {
+          const created = await insertEvent(e);
+          events.push(created);
+        }
+
+        rebuildTypeFilter();
+        renderCalendar();
+        renderTimeline();
+        setDataStatus(`Событий: ${events.length}`);
+        closeModal();
+      }catch(err){
+        alert("Ошибка сохранения: " + err.message);
+        setDataStatus("Ошибка сохранения");
+      }
     }
 
-    function deleteModal(){
+    async function deleteModal(){
       if (!editingId) return;
       if (!confirm("Удалить событие?")) return;
 
-      events = events.filter(x => x.id !== editingId);
-      save();
-      rebuildTypeFilter();
-      renderCalendar();
-      renderTimeline();
-      closeModal();
+      try{
+        setDataStatus("Удаление...");
+        await removeEvent(editingId);
+        events = events.filter(x=>x.id !== editingId);
+        rebuildTypeFilter();
+        renderCalendar();
+        renderTimeline();
+        setDataStatus(`Событий: ${events.length}`);
+        closeModal();
+      }catch(err){
+        alert("Ошибка удаления: " + err.message);
+        setDataStatus("Ошибка удаления");
+      }
     }
 
     function exportJSON(){
       const payload = {
-        version: 1,
         exportedAt: new Date().toISOString(),
+        user: currentUser?.email || null,
         events
       };
 
-      const blob = new Blob(
-        [JSON.stringify(payload, null, 2)],
-        { type: "application/json;charset=utf-8" }
-      );
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type:"application/json;charset=utf-8"
+      });
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "schedule.json";
+      a.download = "schedule-export.json";
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
     }
 
-    async function importJSONFile(file){
-      const text = await file.text();
-      const obj = JSON.parse(text);
-      const arr = Array.isArray(obj) ? obj : obj.events;
-
-      if (!Array.isArray(arr)) {
-        throw new Error("Неверный формат JSON");
-      }
-
-      events = arr.map(normalizeEvent);
-      save();
-      rebuildTypeFilter();
-      renderCalendar();
-      renderTimeline();
-    }
-
-    async function reloadBaseJSON(){
-      try {
-        await loadFromJSON();
-        localStorage.removeItem(STORAGE_KEY);
-        rebuildTypeFilter();
-        renderCalendar();
-        renderTimeline();
-        updateStatusText();
-      } catch (err) {
-        alert("Не удалось загрузить schedule.json. Проверь, что файл лежит рядом с index.html и сайт открыт через http/https, а не через file://");
-      }
-    }
-
-    function debounce(fn, ms){
-      let t = null;
-      return (...args) => {
-        clearTimeout(t);
-        t = setTimeout(() => fn(...args), ms);
-      };
-    }
-
     function wire(){
-      el("tabs").addEventListener("click", (ev) => {
+      if (wired) return;
+      wired = true;
+
+      el("btnRegister").addEventListener("click", register);
+      el("btnLogin").addEventListener("click", login);
+      el("btnLogout").addEventListener("click", logout);
+
+      el("tabs").addEventListener("click", (ev)=>{
         const t = ev.target.closest(".tab");
         if (!t) return;
         mode = t.dataset.mode;
@@ -1192,15 +1142,15 @@
         renderTimeline();
       });
 
-      el("daySelect").addEventListener("change", () => {
+      el("daySelect").addEventListener("change", ()=>{
         selectedDow = Number(el("daySelect").value);
         renderTimeline();
       });
 
-      el("search").addEventListener("input", debounce(renderTimeline, 120));
+      el("search").addEventListener("input", renderTimeline);
       el("typeFilter").addEventListener("change", renderTimeline);
 
-      el("btnToday").addEventListener("click", () => {
+      el("btnToday").addEventListener("click", ()=>{
         selectedDate = todayISO();
         selectedDow = dowFromDateISO(selectedDate);
         el("daySelect").value = String(selectedDow);
@@ -1209,15 +1159,14 @@
         renderTimeline();
       });
 
-      el("timeline").addEventListener("click", (ev) => {
+      el("timeline").addEventListener("click", (ev)=>{
         const b = ev.target.closest("[data-act='edit']");
         if (!b) return;
         openModal(b.dataset.id);
       });
 
-      el("btnAdd").addEventListener("click", () => openModal(null));
-
-      el("btnAddFromDate").addEventListener("click", () => {
+      el("btnAdd").addEventListener("click", ()=>openModal(null));
+      el("btnAddFromDate").addEventListener("click", ()=>{
         openModal(null);
         el("fDate").value = selectedDate;
         el("fDow").value = String(dowFromDateISO(selectedDate));
@@ -1228,86 +1177,59 @@
       el("btnSave").addEventListener("click", saveModal);
       el("btnDelete").addEventListener("click", deleteModal);
 
-      el("modalBack").addEventListener("click", (ev) => {
+      el("modalBack").addEventListener("click", (ev)=>{
         if (ev.target === el("modalBack")) closeModal();
       });
 
-      document.addEventListener("keydown", (ev) => {
+      document.addEventListener("keydown", (ev)=>{
         if (ev.key === "Escape") closeModal();
       });
 
-      el("mPrev").addEventListener("click", () => {
+      el("mPrev").addEventListener("click", ()=>{
         calMonth -= 1;
-        if (calMonth < 0) {
-          calMonth = 11;
-          calYear -= 1;
-        }
+        if (calMonth < 0){ calMonth = 11; calYear -= 1; }
         renderCalendar();
       });
 
-      el("mNext").addEventListener("click", () => {
+      el("mNext").addEventListener("click", ()=>{
         calMonth += 1;
-        if (calMonth > 11) {
-          calMonth = 0;
-          calYear += 1;
-        }
+        if (calMonth > 11){ calMonth = 0; calYear += 1; }
         renderCalendar();
       });
 
       el("btnExport").addEventListener("click", exportJSON);
+    }
 
-      el("btnImport").addEventListener("click", () => {
-        el("fileImport").click();
-      });
+    async function syncUIForAuth(){
+      currentUser = await getCurrentUser();
 
-      el("fileImport").addEventListener("change", async (ev) => {
-        const f = ev.target.files?.[0];
-        if (!f) return;
-
-        try {
-          await importJSONFile(f);
-        } catch (err) {
-          alert("Ошибка импорта: " + (err?.message || err));
-        } finally {
-          ev.target.value = "";
-        }
-      });
-
-      el("btnReloadBase").addEventListener("click", reloadBaseJSON);
-
-      el("btnClear").addEventListener("click", () => {
-        if (!confirm("Удалить локальные данные из браузера?")) return;
-
-        localStorage.removeItem(STORAGE_KEY);
-        loadStarterData();
-        rebuildTypeFilter();
-        renderCalendar();
-        renderTimeline();
-        updateStatusText();
-      });
+      if (currentUser){
+        el("authScreen").classList.add("hidden");
+        el("appScreen").classList.remove("hidden");
+        el("chipUser").textContent = currentUser.email || currentUser.id;
+        await seedStarterEventsForNewUser();
+        await loadEvents();
+      } else {
+        events = [];
+        el("appScreen").classList.add("hidden");
+        el("authScreen").classList.remove("hidden");
+        setAuthStatus("Не авторизован");
+      }
     }
 
     async function boot(){
-      selectedDate = todayISO();
-      selectedDow = dowFromDateISO(selectedDate);
-
-      const hasLocal = loadFromLocalStorage();
-
-      if (!hasLocal) {
-        try {
-          await loadFromJSON();
-        } catch (err) {
-          loadStarterData();
-        }
-      }
-
       initSelects();
       setTabs();
       setCalendarCursorFromSelected();
       renderCalendar();
       renderTimeline();
       wire();
-      updateStatusText();
+
+      await syncUIForAuth();
+
+      supabase.auth.onAuthStateChange(async ()=>{
+        await syncUIForAuth();
+      });
     }
 
     boot();
